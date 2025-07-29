@@ -1,6 +1,11 @@
 name: Deploy
 
 on:
+  push:
+    tags:
+      - "assistant-v*"
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       infrastructure-changed:
@@ -44,15 +49,22 @@ permissions:
   id-token: write
 
 jobs:
+  get-type:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "GITHUB_EVENT_NAME: ${{ github.event_name }}"
+          echo "Tag: ${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+
   check-changes:
     # Mock the check-changes job
     runs-on: ubuntu-latest
     outputs:
-      infrastructure-changed: ${{ inputs.infrastructure-changed }}
-      migrations-changed: ${{ inputs.migrations-changed }}
-      assistant-changed: ${{ inputs.assistant-changed }}
-      knowledge-search-changed: ${{ inputs.knowledge-search-changed }}
-      chat-ui-changed: ${{ inputs.chat-ui-changed }}
+      infrastructure-changed: ${{ inputs.infrastructure-changed || true }}
+      migrations-changed: ${{ inputs.migrations-changed || true }}
+      assistant-changed: ${{ inputs.assistant-changed || true }}
+      knowledge-search-changed: ${{ inputs.knowledge-search-changed || true }}
+      chat-ui-changed: ${{ inputs.chat-ui-changed || true }}
     steps:
       - run: |
           echo "Deploying..."
@@ -118,6 +130,7 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
+            type=match,pattern=v(.*),group=1
             type=raw,value=staging
             type=sha
         env:
