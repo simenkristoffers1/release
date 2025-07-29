@@ -25,6 +25,9 @@ jobs:
       knowledge-search-changed: ${{ steps.check-changes.outputs.knowledge-search-changed }}
       chat-ui-changed: ${{ steps.check-changes.outputs.chat-ui-changed }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Check release tag
         if: github.event_name == 'release'
         run: |
