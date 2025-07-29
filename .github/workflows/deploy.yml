@@ -146,6 +146,8 @@ jobs:
   deploy-knowledge-search:
     runs-on: ubuntu-latest
     needs: [check-changes, provision-infrastructure, apply-migrations]
+    env:
+      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/knowledge-search
     # If the infrastructure or migrations have changed, deploy the knowledge search
     # If the infrastructure or migrations have not changed, deploy the knowledge search if the knowledge search has changed
     if: |
