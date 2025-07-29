@@ -2,6 +2,9 @@ name: Release
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 permissions:
   issues: write
@@ -16,5 +19,5 @@ jobs:
         id: release
         with:
           token: ${{ secrets.PAT }}
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
+          config-file: prerelease-please-config.json
+          manifest-file: .prerelease-please-manifest.json
