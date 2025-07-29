@@ -21,7 +21,17 @@ jobs:
           node-version: "20.x"
           registry-url: "https://registry.npmjs.org"
 
+      - id: get-tag-name
+        run: |
+          echo "GITHUB_REF: ${{ github.ref }}"
+          if [[ "${{ github.ref }}" == *"-beta"* ]]; then
+            echo "tag_name=beta" >> $GITHUB_OUTPUT
+          else
+            echo "tag_name=stable" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+
       - run: npm ci
-      - run: npm publish --provenance --access public
+      - run: npm publish --provenance --access public --tag ${{ steps.get-tag-name.outputs.tag_name }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
