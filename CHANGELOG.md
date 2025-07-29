@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0 (2025-07-29)
+
+
+### Bug Fixes
+
+* add gitignore ([2c1b039](https://github.com/simenkristoffers1/release/commit/2c1b039952e8bc303f6be63cc6397e953db2b473))
+* rename Class1.cs ([ccb6cb0](https://github.com/simenkristoffers1/release/commit/ccb6cb0f689dcb8b1b3073e2375e69346b829e13))
+
 ## 3.1.0 (2025-07-29)
 
 
