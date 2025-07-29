@@ -5,7 +5,7 @@
       ".": {
         "component": "assistant",
         "release-type": "simple",
-        "exclude-paths": "chat-ui"
+        "exclude-paths": ["chat-ui"]
       },
       "chat-ui": {
         "component": "chat-ui",
