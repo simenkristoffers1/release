@@ -1,5 +1,34 @@
 # Changelog
 
+## [2.0.1](https://github.com/simenkristoffers1/release/compare/chat-ui-v2.0.0...chat-ui-v2.0.1) (2025-07-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* add a breaking change
+
+### Features
+
+* add a breaking change ([693c9da](https://github.com/simenkristoffers1/release/commit/693c9da511666d289852f5409a6bb6163f0abbbd))
+
+
+### Bug Fixes
+
+* another thing ([2060f5a](https://github.com/simenkristoffers1/release/commit/2060f5acaba736846c5c92b78a9f75f01ed5bd76))
+* package version ([952f5bd](https://github.com/simenkristoffers1/release/commit/952f5bdede70daf1dd947a4b818cc8379eb5f66e))
+* some change ([952f5bd](https://github.com/simenkristoffers1/release/commit/952f5bdede70daf1dd947a4b818cc8379eb5f66e))
+* some change ([#19](https://github.com/simenkristoffers1/release/issues/19)) ([952f5bd](https://github.com/simenkristoffers1/release/commit/952f5bdede70daf1dd947a4b818cc8379eb5f66e))
+* some fix here ([2e5efd4](https://github.com/simenkristoffers1/release/commit/2e5efd4ef62acc4007b5ed8bbcf941164334b738))
+* something new ([8e7a754](https://github.com/simenkristoffers1/release/commit/8e7a754c7db0f5f8f743e0016c32e7608aa451eb))
+* update name ([0222425](https://github.com/simenkristoffers1/release/commit/0222425672da481db2129849e3307fc03d7259f1))
+* update publish ([add1d5d](https://github.com/simenkristoffers1/release/commit/add1d5dd51f99fcfe9c900a6f5d3ac6bad8b859f))
+
+
+### Miscellaneous Chores
+
+* release chat-ui 2.0.1 ([e73d4f8](https://github.com/simenkristoffers1/release/commit/e73d4f8cf6d02cb4d0be78487474b519a81a12aa))
+* release chat-ui 3.0.0 ([beca2b6](https://github.com/simenkristoffers1/release/commit/beca2b6de31261cd7d0ca8d5378fc284481a51fe))
+
 ## [2.0.0](https://github.com/simenkristoffers1/release/compare/chat-ui-v2.0.0...chat-ui-v2.0.0) (2025-07-29)
 
 
