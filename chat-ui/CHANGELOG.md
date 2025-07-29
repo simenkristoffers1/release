@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/simenkristoffers1/release/compare/chat-ui@v1.0.0...chat-ui@v1.0.1) (2025-07-29)
+
+
+### Bug Fixes
+
+* some fix ([d1e8ed1](https://github.com/simenkristoffers1/release/commit/d1e8ed1558fa7f9c19aeb1d9601068735e7f69f7))
+
 ## 1.0.0 (2025-07-29)
 
 
