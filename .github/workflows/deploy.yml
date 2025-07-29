@@ -95,7 +95,9 @@ jobs:
               print "knowledge-search-changed=" (know ? "true" : "false")
               print "docs-changed=" (docs ? "true" : "false")
             }
-          ' | tee /dev/tty | (test -n "${GITHUB_OUTPUT:-}" && cat >> "$GITHUB_OUTPUT")
+          '  | while IFS= read -r line; do
+            echo "$line" >> "$GITHUB_OUTPUT"
+          done
 
   provision-infrastructure:
     # Mock the provision-infrastructure job
