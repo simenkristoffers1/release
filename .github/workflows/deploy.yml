@@ -46,15 +46,22 @@ permissions:
   id-token: write
 
 jobs:
-  get-type:
+  precheck:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo "GITHUB_EVENT_NAME: ${{ github.event_name }}"
-          echo "Tag: ${{ github.event.release.tag_name }}"
+      - name: Check release tag
+        if: github.event_name == 'release'
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          echo "Tag: $TAG"
+          if [[ ! "$TAG" =~ ^assistant-v.* ]]; then
+            echo "Tag does not match 'assistant-v*'. Skipping workflow."
+            exit 1
+          fi
 
   check-changes:
     # Mock the check-changes job
+    needs: precheck
     runs-on: ubuntu-latest
     outputs:
       infrastructure-changed: ${{ inputs.infrastructure-changed || true }}
