@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.0 (2025-07-29)
+
+## What's Changed
+* chore(main): release chat-ui 2.0.0 by @simenkristoffers1 in https://github.com/simenkristoffers1/release/pull/16
+
+
+**Full Changelog**: https://github.com/simenkristoffers1/release/compare/chat-ui-v1.1.0-beta.4...chat-ui-v2.0.0
+
 ## [2.0.0](https://github.com/simenkristoffers1/release/compare/chat-ui-v3.0.1-beta...chat-ui-v2.0.0) (2025-07-29)
 
 
