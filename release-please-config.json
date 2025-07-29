@@ -1,6 +1,12 @@
 {
     "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "separate-pull-requests": true,
     "packages": {
+      ".": {
+        "component": "assistant",
+        "release-type": "simple",
+        "exclude-paths": "chat-ui"
+      },
       "chat-ui": {
         "component": "chat-ui",
         "package-name": "chat-ui",
@@ -10,30 +16,7 @@
         "versioning": "prerelease",
         "prerelease": true,
         "prerelease-type": "beta"
-      },
-      "assistant": {
-        "component": "assistant",
-        "release-type": "simple"
-      },
-      "infrastructure": {
-        "component": "infrastructure",
-        "release-type": "simple"
-      },
-      "knowledge-search": {
-        "component": "knowledge-search",
-        "release-type": "python"
       }
-    },
-    "plugins": [
-      {
-        "type": "linked-versions",
-        "groupName": "api",
-        "components": [
-          "assistant",
-          "knowledge-search",
-          "infrastructure"
-        ]
-      }
-    ]
+    }
   }
   
