@@ -114,25 +114,17 @@ jobs:
 
       - name: Build and push pre-release image (staging)
         if: ${{ inputs.environment == 'staging' }}
-        id: build-and-push-image
         uses: docker/build-push-action@v6
         with:
           context: ./assistant
           file: ./assistant/Dockerfile
           push: true
+          provenance: mode=max
           tags: |
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
             ${{ env.IMAGE_NAME }}:pre-release
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Generate artifact attestation
-        if: ${{ inputs.environment == 'staging' }} && ${{ steps.build-and-push-image.outcome == 'success' }}
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: ${{ env.IMAGE_NAME }}:${{ github.sha }}
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
 
       - name: Pull pre-release and tag as latest (production)
         if: ${{ inputs.environment == 'production' }}
