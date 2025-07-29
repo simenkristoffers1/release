@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.0.1-beta](https://github.com/simenkristoffers1/release/compare/chat-ui-v3.0.0...chat-ui-v3.0.1-beta) (2025-07-29)
+
+
+### Bug Fixes
+
+* package version ([952f5bd](https://github.com/simenkristoffers1/release/commit/952f5bdede70daf1dd947a4b818cc8379eb5f66e))
+* some change ([952f5bd](https://github.com/simenkristoffers1/release/commit/952f5bdede70daf1dd947a4b818cc8379eb5f66e))
+* some change ([#19](https://github.com/simenkristoffers1/release/issues/19)) ([952f5bd](https://github.com/simenkristoffers1/release/commit/952f5bdede70daf1dd947a4b818cc8379eb5f66e))
+* update publish ([add1d5d](https://github.com/simenkristoffers1/release/commit/add1d5dd51f99fcfe9c900a6f5d3ac6bad8b859f))
+
 ## [3.0.0](https://github.com/simenkristoffers1/release/compare/chat-ui-v2.0.0...chat-ui-v3.0.0) (2025-07-29)
 
 
