@@ -4,6 +4,7 @@
   "packages": {
     ".": {
       "component": "assistant",
+      "release-type": "simple",
       "exclude-paths": ["chat-ui"]
     },
     "chat-ui": {
