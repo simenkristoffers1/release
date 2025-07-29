@@ -12,13 +12,16 @@
         "prerelease-type": "beta"
       },
       "assistant": {
-        "component": "assistant"
+        "component": "assistant",
+        "release-type": "simple"
       },
       "infrastructure": {
-        "component": "infrastructure"
+        "component": "infrastructure",
+        "release-type": "simple"
       },
       "knowledge-search": {
-        "component": "knowledge-search"
+        "component": "knowledge-search",
+        "release-type": "python"
       }
     },
     "plugins": [
