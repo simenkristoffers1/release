@@ -110,6 +110,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/metadata-action@v5
+        if: ${{ inputs.environment == 'staging' }}
         id: meta
         with:
           images: ${{ env.IMAGE_NAME }}
@@ -133,9 +134,9 @@ jobs:
       - name: Pull pre-release and tag as latest (production)
         if: ${{ inputs.environment == 'production' }}
         run: |
-          docker pull ghcr.io/${{ github.repository_owner }}/assistant:pre-release
-          docker tag ghcr.io/${{ github.repository_owner }}/assistant:pre-release ghcr.io/${{ github.repository_owner }}/assistant:latest
-          docker push ghcr.io/${{ github.repository_owner }}/assistant:latest
+          docker pull ghcr.io/${{ github.repository_owner }}/assistant:staging
+          docker tag ghcr.io/${{ github.repository_owner }}/assistant:staging ghcr.io/${{ github.repository_owner }}/assistant:production
+          docker push ghcr.io/${{ github.repository_owner }}/assistant:production
 
       - run: echo "Deploying assistant..."
 
