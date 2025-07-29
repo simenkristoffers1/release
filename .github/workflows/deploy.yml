@@ -1,9 +1,6 @@
 name: Deploy
 
 on:
-  push:
-    tags:
-      - "assistant-v*"
   release:
     types: [published]
   workflow_dispatch:
@@ -54,7 +51,7 @@ jobs:
     steps:
       - run: |
           echo "GITHUB_EVENT_NAME: ${{ github.event_name }}"
-          echo "Tag: ${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          echo "Tag: ${{ github.event.release.tag_name }}"
 
   check-changes:
     # Mock the check-changes job
