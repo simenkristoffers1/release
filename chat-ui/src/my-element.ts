@@ -15,7 +15,7 @@ export class MyElement extends LitElement {
    * Copy for the read the docs hint.
    */
   @property()
-  docsHint = "Click on the Vite and Lit logos to leasrn moresssddsssssss";
+  docsHint = "Click on the Vite and Lit logos to leasrn moresssddssssssss";
 
   /**
    * The number of times the button has been clicked.
