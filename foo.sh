@@ -1,0 +1,1 @@
+jq -r '.packages["chat-ui"].version' package.json
