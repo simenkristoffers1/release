@@ -1,15 +1,15 @@
 {
     "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "versioning": "default",
+    "prerelease": false,
+    "prerelease-type": "beta",
     "packages": {
       "chat-ui": {
         "component": "chat-ui",
         "package-name": "chat-ui",
         "version-file": "package.json",
         "changelog-path": "CHANGELOG.md",
-        "release-type": "node",
-        "versioning": "prerelease",
-        "prerelease": false,
-        "prerelease-type": "beta"
+        "release-type": "node"
       }
     }
   }
