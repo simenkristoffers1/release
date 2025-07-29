@@ -18,7 +18,7 @@ jobs:
   precheck:
     runs-on: ubuntu-latest
     outputs:
-      environment: ${{ steps.check-changes.outputs.environment }}
+      environment: ${{ github.event_name == 'push' && 'staging' || 'production' }}
       infrastructure-changed: ${{ steps.check-changes.outputs.infrastructure-changed }}
       migrations-changed: ${{ steps.check-changes.outputs.migrations-changed }}
       assistant-changed: ${{ steps.check-changes.outputs.assistant-changed }}
@@ -67,14 +67,12 @@ jobs:
 
           echo "PREV_REF=${PREV_REF}" >> "$GITHUB_ENV"
           echo "CURRENT_REF=${CURRENT_REF}" >> "$GITHUB_ENV"
-          echo "environment=production" >> "$GITHUB_OUTPUT"
 
       - name: Check for push event
         if: ${{ github.event_name == 'push' }}
         run: |
           echo "PREV_REF=HEAD~1" >> "$GITHUB_ENV"
           echo "CURRENT_REF=HEAD" >> "$GITHUB_ENV"
-          echo "environment=staging" >> "$GITHUB_OUTPUT"
 
       - id: check-changes
         run: |
