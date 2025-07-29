@@ -4,8 +4,6 @@
     "chat-ui": {
       "component": "chat-ui",
       "package-name": "chat-ui",
-      "version-file": "package.json",
-      "changelog-path": "CHANGELOG.md",
       "release-type": "node",
       "versioning": "prerelease",
       "prerelease": true,
