@@ -1,0 +1,81 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      infrastructure-changed:
+        description: "Whether the infrastructure has changed"
+        required: true
+        default: "true"
+      migrations-changed:
+        description: "Whether the migrations have changed"
+        required: true
+        default: "true"
+      assistant-changed:
+        description: "Whether the assistant has changed"
+        required: true
+        default: "true"
+      knowledge-search-changed:
+        description: "Whether the knowledge search has changed"
+        required: true
+        default: "true"
+      chat-ui-changed:
+        description: "Whether the chat UI has changed"
+        required: true
+        default: "true"
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      infrastructure-changed: ${{ inputs.infrastructure-changed }}
+      migrations-changed: ${{ inputs.migrations-changed }}
+      assistant-changed: ${{ inputs.assistant-changed }}
+      knowledge-search-changed: ${{ inputs.knowledge-search-changed }}
+      chat-ui-changed: ${{ inputs.chat-ui-changed }}
+    steps:
+      - run: |
+          echo "Deploying..."
+          echo "Infrastructure changed: ${{ inputs.infrastructure-changed }}"
+          echo "Migrations changed: ${{ inputs.migrations-changed }}"
+          echo "Assistant changed: ${{ inputs.assistant-changed }}"
+          echo "Knowledge search changed: ${{ inputs.knowledge-search-changed }}"
+          echo "Chat UI changed: ${{ inputs.chat-ui-changed }}"
+
+  provision-infrastructure:
+    runs-on: ubuntu-latest
+    needs: check-changes
+    if: needs.check-changes.outputs.infrastructure-changed == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Provisioning infrastructure..."
+
+  apply-migrations:
+    runs-on: ubuntu-latest
+    needs: [check-changes, provision-infrastructure]
+    if: needs.check-changes.outputs.migrations-changed == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Applying migrations..."
+
+  deploy-assistant:
+    runs-on: ubuntu-latest
+    needs: [check-changes, provision-infrastructure, apply-migrations]
+    if: |
+      needs.check-changes.outputs.assistant-changed == 'true' && 
+      (needs.provision-infrastructure.result == 'success' || needs.provision-infrastructure.result == 'skipped') &&
+      (needs.apply-migrations.result == 'success' || needs.apply-migrations.result == 'skipped')
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Deploying assistant..."
+
+  deploy-knowledge-search:
+    runs-on: ubuntu-latest
+    needs: [check-changes, provision-infrastructure, apply-migrations]
+    if: |
+      needs.check-changes.outputs.knowledge-search-changed == 'true' && 
+      (needs.provision-infrastructure.result == 'success' || needs.provision-infrastructure.result == 'skipped') &&
+      (needs.apply-migrations.result == 'success' || needs.apply-migrations.result == 'skipped')
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Deploying knowledge-search..."
