@@ -1,6 +1,11 @@
 name: Publish
 on:
   workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: chat-ui
+
 jobs:
   publish:
     runs-on: ubuntu-latest

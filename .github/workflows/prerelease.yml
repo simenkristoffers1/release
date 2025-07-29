@@ -11,10 +11,6 @@ permissions:
   contents: write
   pull-requests: write
 
-defaults:
-  run:
-    working-directory: chat-ui
-
 jobs:
   release:
     runs-on: ubuntu-latest
