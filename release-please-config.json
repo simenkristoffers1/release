@@ -10,7 +10,27 @@
         "versioning": "prerelease",
         "prerelease": true,
         "prerelease-type": "beta"
+      },
+      "assistant": {
+        "component": "assistant"
+      },
+      "infrastructure": {
+        "component": "infrastructure"
+      },
+      "knowledge-search": {
+        "component": "knowledge-search"
       }
-    }
+    },
+    "plugins": [
+      {
+        "type": "linked-versions",
+        "groupName": "api",
+        "components": [
+          "assistant",
+          "knowledge-search",
+          "infrastructure"
+        ]
+      }
+    ]
   }
   
