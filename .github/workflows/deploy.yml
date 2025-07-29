@@ -120,6 +120,8 @@ jobs:
           tags: |
             type=raw,value=staging
             type=sha
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
 
       - name: Build and push staging image
         if: ${{ inputs.environment == 'staging' }}
@@ -131,6 +133,7 @@ jobs:
           provenance: mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -174,6 +177,8 @@ jobs:
           tags: |
             type=raw,value=staging
             type=sha
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
 
       - name: Build and push staging image
         if: ${{ inputs.environment == 'staging' }}
@@ -185,6 +190,7 @@ jobs:
           provenance: mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
