@@ -1,12 +1,15 @@
 {
   "name": "chat-ui",
   "private": true,
-  "version": "3.0.0",
+  "version": "3.0.1-beta.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
+  },
+  "exports": {
+    "./package.json": "./package.json"
   },
   "dependencies": {
     "lit": "^3.3.0"
@@ -14,5 +17,13 @@
   "devDependencies": {
     "typescript": "~5.8.3",
     "vite": "^7.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simenkristoffers1/release.git"
+  },
+  "homepage": "https://github.com/simenkristoffers1/release#readme",
+  "bugs": {
+    "url": "https://github.com/simenkristoffers1/release/issues"
   }
 }
