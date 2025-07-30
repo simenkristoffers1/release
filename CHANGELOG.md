@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/simenkristoffers1/release/compare/assistant-v1.0.1...assistant-v1.1.0) (2025-07-30)
+
+
+### Features
+
+* update logger ([b8fe6a7](https://github.com/simenkristoffers1/release/commit/b8fe6a7890093b49c53d20393a74a6e9162f9748))
+
 ## [1.0.1](https://github.com/simenkristoffers1/release/compare/assistant-v1.0.0...assistant-v1.0.1) (2025-07-29)
 
 
