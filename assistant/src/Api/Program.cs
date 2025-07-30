@@ -1,3 +1,3 @@
 ﻿using System;
 
-Console.WriteLine("Halla påræ!");
+Console.WriteLine("Hello, verden!");
