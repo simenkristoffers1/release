@@ -2,47 +2,72 @@ name: Deploy Assistant
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to deploy"
-        required: true
-        default: "assistant-v0.0.1"
-      image_name:
-        description: "Image name"
-        required: true
-        default: "assistant"
-      context:
-        description: "Context"
-        required: true
-        default: "./assistant"
-      file:
-        description: "File"
-        required: true
-        default: "./assistant/Dockerfile"
 
 permissions:
   contents: read
   packages: write
 
 jobs:
-  test-staging:
-    runs-on: ubuntu-latest
-    environment: staging
-    steps:
-      - run: |
-          echo "Testing assistant in staging..."
+  build-assistant-image:
+    uses: ./.github/workflows/reusable-build-docker.yml
+    with:
+      image-name: aiasst-api
+      context: ./assistant
+      file: ./assistant/Dockerfile
 
-  deploy-staging:
+  deploy-assistant-image-staging:
     runs-on: ubuntu-latest
     environment: staging
+    needs: build-assistant-image
+    outputs:
+      image-name-with-digest: ${{ needs.build-assistant-image.outputs.image-name-with-digest }}
     steps:
       - run: |
-          echo "Deploying assistant to staging..."
+          echo "Deploying assistant image ${{ needs.build-assistant-image.outputs.image-name-with-digest }} to staging..."
+
+  build-cleanup-job-image:
+    uses: ./.github/workflows/reusable-build-docker.yml
+    with:
+      image-name: aiasst-cleanup-job
+      context: ./assistant
+      file: ./assistant/Dockerfile.ConversationCleanupJob
+
+  deploy-cleanup-job-image-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    needs: build-cleanup-job-image
+    outputs:
+      image-name-with-digest: ${{ needs.build-cleanup-job-image.outputs.image-name-with-digest }}
+    steps:
+      - run: |
+          echo "Deploying cleanup job image ${{ needs.build-cleanup-job-image.outputs.image-name-with-digest }} to staging..."
+
+  build-knowledge-image:
+    uses: ./.github/workflows/reusable-build-docker.yml
+    with:
+      image-name: aiasst-knowledge
+      context: ./knowledge-search
+      file: ./knowledge-search/Dockerfile
+
+  deploy-knowledge-image-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    needs: build-knowledge-image
+    outputs:
+      image-name-with-digest: ${{ needs.build-knowledge-image.outputs.image-name-with-digest }}
+    steps:
+      - run: |
+          echo "Deploying knowledge image ${{ needs.build-knowledge-image.outputs.image-name-with-digest }} to staging..."
 
   wait-for-production-approval:
     runs-on: ubuntu-latest
     environment: production-approval
-    needs: test-staging
+    needs:
+      [
+        deploy-assistant-image-staging,
+        deploy-cleanup-job-image-staging,
+        deploy-knowledge-image-staging,
+      ]
     steps:
       - run: |
           echo "Waiting for production approval..."
@@ -58,18 +83,20 @@ jobs:
   deploy-production:
     runs-on: ubuntu-latest
     environment: production
-    needs: wait-for-production-approval
+    needs:
+      [
+        test-production,
+        deploy-assistant-image-staging,
+        deploy-cleanup-job-image-staging,
+        deploy-knowledge-image-staging,
+      ]
     steps:
       - run: |
           echo "Deploying assistant to production..."
+          echo "assistant: ${{ needs.deploy-assistant-image-staging.outputs.image-name-with-digest }}"
+          echo "cleanup-job: ${{ needs.deploy-cleanup-job-image-staging.outputs.image-name-with-digest }}"
+          echo "knowledge: ${{ needs.deploy-knowledge-image-staging.outputs.image-name-with-digest }}"
 
-  # call-build-docker-image:
-  #   uses: ./.github/workflows/reusable-build-docker.yml
-  #   with:
-  #     image-name: ${{ inputs.image_name }}
-  #     version: ${{ inputs.version }}
-  #     context: ${{ inputs.context }}
-  #     file: ${{ inputs.file }}
   # debug:
   #   runs-on: ubuntu-latest
   #   needs: call-build-docker-image
