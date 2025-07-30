@@ -66,8 +66,8 @@ jobs:
     uses: ./.github/workflows/reusable-build-docker.yml
     needs: [detect-changes, apply-migrations-staging]
     if: |
-      needs.detect-changes.outputs.assistant-changed == 'true' &&
-      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped')
+      (always() && needs.detect-changes.outputs.assistant-changed == 'true' &&
+      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
     with:
       image-name: aiasst-api
       context: ./assistant
@@ -88,8 +88,8 @@ jobs:
     uses: ./.github/workflows/reusable-build-docker.yml
     needs: [detect-changes, apply-migrations-staging]
     if: |
-      needs.detect-changes.outputs.assistant-changed == 'true' &&
-      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped')
+      (always() && needs.detect-changes.outputs.assistant-changed == 'true' &&
+      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
     with:
       image-name: aiasst-cleanup-job
       context: ./assistant
@@ -110,8 +110,8 @@ jobs:
     uses: ./.github/workflows/reusable-build-docker.yml
     needs: [detect-changes, apply-migrations-staging]
     if: |
-      needs.detect-changes.outputs.knowledge-changed == 'true' &&
-      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped')
+      (always() && needs.detect-changes.outputs.knowledge-changed == 'true' &&
+      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
     with:
       image-name: aiasst-knowledge
       context: ./knowledge-search
@@ -156,8 +156,8 @@ jobs:
     needs: [detect-changes, provision-infrastructure-production]
     environment: production
     if: |
-      needs.detect-changes.outputs.migrations-changed == 'true' &&
-      (needs.provision-infrastructure-production.result == 'success' || needs.provision-infrastructure-production.result == 'skipped')
+      (always() && needs.detect-changes.outputs.migrations-changed == 'true' &&
+      (needs.provision-infrastructure-production.result == 'success' || needs.provision-infrastructure-production.result == 'skipped'))
     steps:
       - run: |
           echo "Applying migrations..."
