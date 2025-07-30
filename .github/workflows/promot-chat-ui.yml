@@ -17,8 +17,10 @@ jobs:
 
       - id: get-new-version
         run: |
-          CURRENT_VERSION=$(npm view . version)
+          CURRENT_VERSION=$(npm pkg get version)
+          echo "Current version: $CURRENT_VERSION"
           NEW_VERSION=$(echo $CURRENT_VERSION | sed 's/-beta.*//')
+          echo "New version: $NEW_VERSION"
 
           if [ "$NEW_VERSION" == "$CURRENT_VERSION" ]; then
             echo "New version is the same as current version"
