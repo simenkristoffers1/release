@@ -144,9 +144,9 @@ jobs:
       - name: Pull pre-release and tag as latest (production)
         if: ${{ inputs.environment == 'production' }}
         run: |
-          docker pull ghcr.io/${{ github.repository_owner }}/assistant:staging
-          docker tag ghcr.io/${{ github.repository_owner }}/assistant:staging ghcr.io/${{ github.repository_owner }}/assistant:${{ inputs.release_version }}
-          docker push ghcr.io/${{ github.repository_owner }}/assistant
+          docker pull ${{ env.IMAGE_NAME }}:latest
+          docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
+          docker push ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
 
       - run: echo "Deploying assistant..."
 
@@ -200,8 +200,8 @@ jobs:
       - name: Pull pre-release and tag as latest (production)
         if: ${{ inputs.environment == 'production' }}
         run: |
-          docker pull ghcr.io/${{ github.repository_owner }}/knowledge-search:staging
-          docker tag ghcr.io/${{ github.repository_owner }}/knowledge-search:staging ghcr.io/${{ github.repository_owner }}/knowledge-search:${{ inputs.release_version }}
-          docker push ghcr.io/${{ github.repository_owner }}/knowledge-search
+          docker pull ${{ env.IMAGE_NAME }}:latest
+          docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
+          docker push ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
       - uses: actions/checkout@v4
       - run: echo "Deploying knowledge-search..."
