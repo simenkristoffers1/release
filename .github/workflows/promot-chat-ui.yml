@@ -23,8 +23,6 @@ jobs:
           if [ "$NEW_VERSION" == "$CURRENT_VERSION" ]; then
             echo "New version is the same as current version"
             NEW_VERSION=""
-          else
-            npm version $NEW_VERSION
           fi
 
           echo "new-version=$NEW_VERSION" >> $GITHUB_OUTPUT
@@ -35,8 +33,7 @@ jobs:
         run: |
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git add chat-ui/package.json
-          git commit -m "chore: promote chat-ui to stable version" -m "Release-As: ${{ steps.get-new-version.outputs.new-version }}"
+          git commit --allow-empty -m "chore: promote chat-ui to stable version" -m "Release-As: ${{ steps.get-new-version.outputs.new-version }}"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
