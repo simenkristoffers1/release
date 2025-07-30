@@ -1,3 +1,3 @@
 ﻿using System;
 
-Console.WriteLine("Halla balla!");
+Console.WriteLine("Halla ball!");
