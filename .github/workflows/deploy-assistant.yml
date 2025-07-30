@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [detect-changes, provision-infrastructure-staging]
     if: |
-      (needs.detect-changes.outputs.migrations-changed == 'true' &&
+      (needs.detect-changes.outputs.migrations-changed == true &&
       (needs.provision-infrastructure-staging.result == 'success' || needs.provision-infrastructure-staging.result == 'skipped'))
     environment: staging
     steps:
