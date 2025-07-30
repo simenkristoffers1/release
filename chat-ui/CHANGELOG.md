@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.1.1](https://github.com/simenkristoffers1/release/compare/chat-ui-v1.1.1...chat-ui-v1.1.1) (2025-07-30)
+
+
+### Features
+
+* some new feat ([6ae3194](https://github.com/simenkristoffers1/release/commit/6ae31948230b33089cd89318911c6b925ae0586b))
+
+
+### Bug Fixes
+
+* a second fix ([1fbc901](https://github.com/simenkristoffers1/release/commit/1fbc901a872885cca2bdefef3cd61200a75918ca))
+* opacity in css ([3899504](https://github.com/simenkristoffers1/release/commit/3899504d4adae2bc8f52d7673eebcdf76e3cb721))
+* some other fix ([8169743](https://github.com/simenkristoffers1/release/commit/8169743ac01b9e0fc901f36c2a01228276abfe1d))
+* something ([136c20b](https://github.com/simenkristoffers1/release/commit/136c20b9b3383a76cb82c040c8a84a5912fad36c))
+
+
+### Miscellaneous Chores
+
+* promote chat-ui to stable version ([#50](https://github.com/simenkristoffers1/release/issues/50)) ([dce65a0](https://github.com/simenkristoffers1/release/commit/dce65a09402eaa4acec0e6a538b325461e5396be))
+* promote chat-ui to stable version ([#55](https://github.com/simenkristoffers1/release/issues/55)) ([4a61572](https://github.com/simenkristoffers1/release/commit/4a615721719ad2a4482f9249424ad895ee55e7bc))
+
 ## [1.1.1](https://github.com/simenkristoffers1/release/compare/chat-ui-v1.1.1-beta...chat-ui-v1.1.1) (2025-07-30)
 
 
