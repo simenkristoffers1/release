@@ -7,10 +7,6 @@ on:
         description: "Image name"
         required: true
         type: string
-      version:
-        description: "Version"
-        required: true
-        type: string
       context:
         description: "Context"
         required: true
@@ -48,7 +44,6 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
-            type=match,pattern=v(.*),group=1,value=${{ inputs.version }}
             type=sha
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
