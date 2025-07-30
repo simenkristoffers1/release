@@ -17,7 +17,7 @@ jobs:
 
       - id: get-new-version
         run: |
-          CURRENT_VERSION=$(npm pkg get version)
+          CURRENT_VERSION=$(npm pkg get version | tr -d '"')
           echo "Current version: $CURRENT_VERSION"
           NEW_VERSION=$(echo $CURRENT_VERSION | sed 's/-beta.*//')
           echo "New version: $NEW_VERSION"
