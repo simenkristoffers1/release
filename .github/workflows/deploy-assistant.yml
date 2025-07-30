@@ -10,6 +10,7 @@ on:
       migrations-changed:
         description: "Migrations changed"
         required: true
+        type: boolean
       assistant-changed:
         description: "Assistant changed"
         required: true
@@ -143,7 +144,7 @@ jobs:
   provision-infrastructure-production:
     runs-on: ubuntu-latest
     environment: production
-    needs: detect-changes
+    needs: [detect-changes, wait-for-production-approval]
     if: |
       needs.detect-changes.outputs.infrastructure-changed == 'true'
     steps:
