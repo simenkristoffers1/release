@@ -25,16 +25,38 @@ permissions:
   packages: write
 
 jobs:
-  call-build-docker-image:
-    uses: ./.github/workflows/reusable-build-docker.yml
-    with:
-      image-name: ${{ inputs.image_name }}
-      version: ${{ inputs.version }}
-      context: ${{ inputs.context }}
-      file: ${{ inputs.file }}
-  debug:
+  test-staging:
     runs-on: ubuntu-latest
-    needs: call-build-docker-image
+    environment: staging
     steps:
       - run: |
-          echo "Image name: ${{ needs.call-build-docker-image.outputs.image-name-with-digest }}"
+          echo "Deploying assistant..."
+          echo "Tag: ${{ github.ref_name }}"
+
+  wait-for-production-approval:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: test-staging
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: wait-for-production-approval
+    steps:
+      - run: |
+          echo "Deploying assistant..."
+          echo "Tag: ${{ github.ref_name }}"
+
+  # call-build-docker-image:
+  #   uses: ./.github/workflows/reusable-build-docker.yml
+  #   with:
+  #     image-name: ${{ inputs.image_name }}
+  #     version: ${{ inputs.version }}
+  #     context: ${{ inputs.context }}
+  #     file: ${{ inputs.file }}
+  # debug:
+  #   runs-on: ubuntu-latest
+  #   needs: call-build-docker-image
+  #   steps:
+  #     - run: |
+  #         echo "Image name: ${{ needs.call-build-docker-image.outputs.image-name-with-digest }}"
