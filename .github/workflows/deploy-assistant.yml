@@ -20,6 +20,10 @@ on:
         required: true
         default: "./assistant/Dockerfile"
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   call-build-docker-image:
     uses: ./.github/workflows/reusable-build-docker.yml
