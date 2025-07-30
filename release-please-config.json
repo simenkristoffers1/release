@@ -4,12 +4,41 @@
   "separate-pull-requests": true,
   "bump-minor-pre-major": true,
   "packages": {
-    ".": {
+    "assistant": {
       "component": "assistant",
       "release-type": "simple",
       "exclude-paths": [
-        "chat-ui"
+        "src/DbUpMigrator"
       ],
+      "initial-version": "0.0.1",
+      "extra-files": [
+        {
+          "type": "xml",
+          "path": "Directory.Build.props",
+          "xpath": "/Project/PropertyGroup/Version"
+        }
+      ]
+    },
+    "assistant/src/DbUpMigrator": {
+      "component": "migrations",
+      "release-type": "simple",
+      "initial-version": "0.0.1",
+      "extra-files": [
+        {
+          "type": "xml",
+          "path": "DbUpMigrator.csproj",
+          "xpath": "/Project/PropertyGroup/Version"
+        }
+      ]
+    },
+    "infrastructure": {
+      "component": "infrastructure",
+      "release-type": "simple",
+      "initial-version": "0.0.1"
+    },
+    "knowledge-search": {
+      "component": "knowledge-search",
+      "release-type": "python",
       "initial-version": "0.0.1"
     },
     "chat-ui": {
