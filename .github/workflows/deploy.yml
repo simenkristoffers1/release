@@ -11,6 +11,10 @@ on:
         description: "The git tag of the release, if one was created"
         required: false
         type: string
+      release_version:
+        description: "The version of the release"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -119,8 +123,6 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=match,pattern=v(.*),group=1,value=${{ inputs.release_tag }}
-            type=raw,value=staging
             type=sha
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
@@ -143,8 +145,8 @@ jobs:
         if: ${{ inputs.environment == 'production' }}
         run: |
           docker pull ghcr.io/${{ github.repository_owner }}/assistant:staging
-          docker tag ghcr.io/${{ github.repository_owner }}/assistant:staging ghcr.io/${{ github.repository_owner }}/assistant:production
-          docker push ghcr.io/${{ github.repository_owner }}/assistant:production
+          docker tag ghcr.io/${{ github.repository_owner }}/assistant:staging ghcr.io/${{ github.repository_owner }}/assistant:${{ inputs.release_version }}
+          docker push ghcr.io/${{ github.repository_owner }}/assistant
 
       - run: echo "Deploying assistant..."
 
@@ -177,8 +179,6 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=match,pattern=v(.*),group=1,value=${{ inputs.release_tag }}
-            type=raw,value=staging
             type=sha
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
@@ -201,7 +201,7 @@ jobs:
         if: ${{ inputs.environment == 'production' }}
         run: |
           docker pull ghcr.io/${{ github.repository_owner }}/knowledge-search:staging
-          docker tag ghcr.io/${{ github.repository_owner }}/knowledge-search:staging ghcr.io/${{ github.repository_owner }}/knowledge-search:production
-          docker push ghcr.io/${{ github.repository_owner }}/knowledge-search:production
+          docker tag ghcr.io/${{ github.repository_owner }}/knowledge-search:staging ghcr.io/${{ github.repository_owner }}/knowledge-search:${{ inputs.release_version }}
+          docker push ghcr.io/${{ github.repository_owner }}/knowledge-search
       - uses: actions/checkout@v4
       - run: echo "Deploying knowledge-search..."
