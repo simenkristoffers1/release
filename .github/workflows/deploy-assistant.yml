@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - "assistant-*"
-    branches:
-      - main
 
 jobs:
   deploy:
@@ -14,3 +12,4 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           echo "Deploying assistant..."
+          echo "Tag: ${{ github.ref_name }}"
