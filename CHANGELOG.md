@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/simenkristoffers1/release/compare/assistant-v1.1.2...assistant-v1.1.3) (2025-07-30)
+
+
+### Bug Fixes
+
+* knowledge-search ([1f8f712](https://github.com/simenkristoffers1/release/commit/1f8f7125e3218988ad3b543a0c845e3e65186264))
+
 ## [1.1.2](https://github.com/simenkristoffers1/release/compare/assistant-v1.1.1...assistant-v1.1.2) (2025-07-30)
 
 
