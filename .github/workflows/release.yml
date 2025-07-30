@@ -25,6 +25,11 @@ jobs:
     needs: release
     uses: ./.github/workflows/deploy.yml
     if: ${{ needs.release.outputs.release_created == 'true' || needs.release.outputs.prs_created == 'true' }}
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
     with:
       environment: ${{ needs.release-please.outputs.release_created == 'true' && 'production' || 'staging' }}
       release_tag: ${{ needs.release-please.outputs.tag_name }}
