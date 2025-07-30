@@ -1,1 +1,3 @@
-﻿Console.WriteLine("Hello, World! Wassaaap?");
+﻿using System;
+
+Console.WriteLine("Halla påræ!");
