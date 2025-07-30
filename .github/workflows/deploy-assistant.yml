@@ -32,6 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image-name: ${{ steps.set-image-name.outputs.image-name }}
+    permissions:
+      contents: read
+      packages: write
     env:
       IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}
     steps:
@@ -66,8 +69,7 @@ jobs:
           cache-to: type=gha,mode=max
       - id: set-image-name
         run: |
-          IMAGE_NAME_WITH_VERSION="${{ env.IMAGE_NAME }}@${{ inputs.version }}"
-          echo "image-name=$IMAGE_NAME_WITH_VERSION" >> $GITHUB_OUTPUT
+          echo "image-name=${{ env.IMAGE_NAME }}@${{ steps.build-push.outputs.digest }}" >> $GITHUB_OUTPUT
   debug:
     runs-on: ubuntu-latest
     needs: build-docker-image
