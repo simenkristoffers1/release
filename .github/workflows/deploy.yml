@@ -1,12 +1,16 @@
 name: Deploy
 
 on:
-  push:
-    branches:
-      - main
-  release:
-    types: [published]
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      environment:
+        description: "The deployment environment (staging or production)"
+        required: true
+        type: string
+      release_tag:
+        description: "The git tag of the release, if one was created"
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -18,7 +22,6 @@ jobs:
   precheck:
     runs-on: ubuntu-latest
     outputs:
-      environment: ${{ github.event_name == 'release' && 'production' || 'staging' }}
       infrastructure-changed: ${{ steps.filter.outputs.infrastructure == 'true' }}
       migrations-changed: ${{ steps.filter.outputs.migrations == 'true' }}
       assistant-changed: ${{ steps.filter.outputs.assistant == 'true' }}
@@ -28,12 +31,12 @@ jobs:
         with:
           fetch-depth: 0
       - id: previous-tag
-        if: github.event_name == 'release'
+        if: inputs.environment == 'production'
         run: |
           set -euo pipefail
           readonly TAG_PREFIX="assistant-v"
 
-          CURRENT_TAG="${{ github.event.release.tag_name }}"
+          CURRENT_TAG="${{ inputs.release_tag }}"
           echo "Tag: $CURRENT_TAG"
           if [[ ! "$CURRENT_TAG" =~ ^$TAG_PREFIX.* ]]; then
             echo "Tag does not match '$TAG_PREFIX*'. Skipping workflow."
@@ -111,7 +114,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/metadata-action@v5
-        if: ${{ needs.precheck.outputs.environment == 'staging' }}
+        if: ${{ inputs.environment == 'staging' }}
         id: meta
         with:
           images: ${{ env.IMAGE_NAME }}
@@ -123,7 +126,7 @@ jobs:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
 
       - name: Build and push staging image
-        if: ${{ needs.precheck.outputs.environment == 'staging' }}
+        if: ${{ inputs.environment == 'staging' }}
         uses: docker/build-push-action@v6
         with:
           context: ./assistant
@@ -137,7 +140,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Pull pre-release and tag as latest (production)
-        if: ${{ needs.precheck.outputs.environment == 'production' }}
+        if: ${{ inputs.environment == 'production' }}
         run: |
           docker pull ghcr.io/${{ github.repository_owner }}/assistant:staging
           docker tag ghcr.io/${{ github.repository_owner }}/assistant:staging ghcr.io/${{ github.repository_owner }}/assistant:production
@@ -169,7 +172,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/metadata-action@v5
-        if: ${{ needs.precheck.outputs.environment == 'staging' }}
+        if: ${{ inputs.environment == 'staging' }}
         id: meta
         with:
           images: ${{ env.IMAGE_NAME }}
@@ -180,7 +183,7 @@ jobs:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
 
       - name: Build and push staging image
-        if: ${{ needs.precheck.outputs.environment == 'staging' }}
+        if: ${{ inputs.environment == 'staging' }}
         uses: docker/build-push-action@v6
         with:
           context: ./knowledge-search
@@ -194,7 +197,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Pull pre-release and tag as latest (production)
-        if: ${{ needs.precheck.outputs.environment == 'production' }}
+        if: ${{ inputs.environment == 'production' }}
         run: |
           docker pull ghcr.io/${{ github.repository_owner }}/knowledge-search:staging
           docker tag ghcr.io/${{ github.repository_owner }}/knowledge-search:staging ghcr.io/${{ github.repository_owner }}/knowledge-search:production
