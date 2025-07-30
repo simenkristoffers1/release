@@ -119,7 +119,7 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=match,pattern=v(.*),group=1
+            type=match,pattern=v(.*),group=1,value=${{ inputs.release_tag }}
             type=raw,value=staging
             type=sha
         env:
@@ -177,6 +177,7 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
+            type=match,pattern=v(.*),group=1,value=${{ inputs.release_tag }}
             type=raw,value=staging
             type=sha
         env:
