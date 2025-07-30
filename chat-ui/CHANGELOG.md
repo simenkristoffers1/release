@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1-beta](https://github.com/simenkristoffers1/release/compare/chat-ui-v1.1.0...chat-ui-v1.1.1-beta) (2025-07-30)
+
+
+### Bug Fixes
+
+* opacity in css ([3899504](https://github.com/simenkristoffers1/release/commit/3899504d4adae2bc8f52d7673eebcdf76e3cb721))
+
 ## [1.1.0](https://github.com/simenkristoffers1/release/compare/chat-ui-v1.1.0-beta...chat-ui-v1.1.0) (2025-07-30)
 
 
