@@ -11,22 +11,32 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
 
-      - name: Remove "-beta*" from chat-ui/package.json version
+      - id: get-new-version
         run: |
-          # Install jq if not present
-          sudo apt-get update && sudo apt-get install -y jq
+          CURRENT_VERSION=$(npm view . version)
+          NEW_VERSION=$(echo $CURRENT_VERSION | sed 's/-beta.*//')
 
-          # Strip '-beta...' from the version field
-          jq '.version |= sub("-beta.*"; "")' chat-ui/package.json > chat-ui/package.json.tmp
-          mv chat-ui/package.json.tmp chat-ui/package.json
+          if [ "$NEW_VERSION" == "$CURRENT_VERSION" ]; then
+            echo "New version is the same as current version"
+            NEW_VERSION=""
+          else
+            npm version $NEW_VERSION
+          fi
+
+          echo "new-version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        working-directory: chat-ui
 
       - name: Commit version change
+        if: steps.get-new-version.outputs.new-version != ''
         run: |
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
           git add chat-ui/package.json
-          git commit -m "chore: promote chat-ui version by removing -beta suffix"
+          git commit -m "chore: promote chat-ui to stable version"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
