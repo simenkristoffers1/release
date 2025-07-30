@@ -19,16 +19,15 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       environment: ${{ github.event_name == 'release' && 'production' || 'staging' }}
-      infrastructure-changed: ${{ steps.check-changes.outputs.infrastructure-changed }}
-      migrations-changed: ${{ steps.check-changes.outputs.migrations-changed }}
-      assistant-changed: ${{ steps.check-changes.outputs.assistant-changed }}
-      knowledge-search-changed: ${{ steps.check-changes.outputs.knowledge-search-changed }}
-      chat-ui-changed: ${{ steps.check-changes.outputs.chat-ui-changed }}
+      infrastructure-changed: ${{ steps.filter.outputs.infrastructure == 'true' }}
+      migrations-changed: ${{ steps.filter.outputs.migrations == 'true' }}
+      assistant-changed: ${{ steps.filter.outputs.assistant == 'true' }}
+      knowledge-search-changed: ${{ steps.filter.outputs.knowledge-search == 'true' }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Check release tag
+      - id: previous-tag
         if: github.event_name == 'release'
         run: |
           set -euo pipefail
@@ -40,65 +39,26 @@ jobs:
             echo "Tag does not match '$TAG_PREFIX*'. Skipping workflow."
             exit 1
           fi
-
-          if [[ -z "$CURRENT_TAG" ]]; then
-            echo "❌ Error: CURRENT_TAG is not set."
-            exit 1
-          fi
-
-          echo "🔎 Analyzing changes for current tag: $CURRENT_TAG"
-
           prev_tag=$(git tag --list "${TAG_PREFIX}*" | sort -V | grep -B 1 "$CURRENT_TAG" | head -n 1)
 
           if [[ "$prev_tag" == "$CURRENT_TAG" ]]; then
-            prev_tag=""
+            prev_tag=$(git rev-list --max-parents=0 --abbrev-commit HEAD)
           fi
+          echo "tag=$prev_tag" >> $GITHUB_OUTPUT
 
-          readonly CURRENT_REF="$CURRENT_TAG"
-          declare PREV_REF
-
-          if [[ -z "$prev_tag" ]]; then
-            echo "⚠️ No previous tag found. Comparing against the initial commit." >&2
-            PREV_REF=$(git rev-list --max-parents=0 --abbrev-commit HEAD)
-          else
-            PREV_REF="$prev_tag"
-            echo "✅ Found previous tag: $PREV_REF"
-          fi
-
-          echo "PREV_REF=${PREV_REF}" >> "$GITHUB_ENV"
-          echo "CURRENT_REF=${CURRENT_REF}" >> "$GITHUB_ENV"
-
-      - name: Check for push event
-        if: ${{ github.event_name == 'push' }}
-        run: |
-          echo "PREV_REF=HEAD~1" >> "$GITHUB_ENV"
-          echo "CURRENT_REF=HEAD" >> "$GITHUB_ENV"
-
-      - id: check-changes
-        run: |
-          echo "↔️  Comparing commit range: $PREV_REF..$CURRENT_REF"
-          echo
-
-          echo "--- Detected Changes ---"
-          git diff --name-only "$PREV_REF..$CURRENT_REF" | awk '
-            BEGIN {
-              infra=0; mig=0; asst=0; know=0; docs=0;
-            }
-            /infrastructure\/.*\.bicep$/                 { infra = 1 }
-            /assistant\/src\/DbUpMigrator\/scripts\/.*\.sql$/ { mig = 1 }
-            /assistant\/.*\.cs$/                         { asst = 1 }
-            /knowledge-search\/.*\.py$/                  { know = 1 }
-            /docs\/.*\.md$/                             { docs = 1 }
-            END {
-              print "infrastructure-changed=" (infra ? "true" : "false")
-              print "migrations-changed=" (mig ? "true" : "false")
-              print "assistant-changed=" (asst ? "true" : "false")
-              print "knowledge-search-changed=" (know ? "true" : "false")
-              print "docs-changed=" (docs ? "true" : "false")
-            }
-          '  | while IFS= read -r line; do
-            echo "$line" >> "$GITHUB_OUTPUT"
-          done
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ steps.previous-tag.outputs.tag }}
+          filters: |
+            infrastructure:
+              - 'infrastructure/**/*.bicep'
+            migrations:
+              - 'assistant/src/DbUpMigrator/scripts/**/*.sql'
+            assistant:
+              - 'assistant/**'
+            knowledge-search:
+              - 'knowledge-search/**'
 
   provision-infrastructure:
     # Mock the provision-infrastructure job
