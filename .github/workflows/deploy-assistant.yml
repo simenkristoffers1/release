@@ -2,22 +2,60 @@ name: Deploy Assistant
 
 on:
   workflow_dispatch:
+    inputs:
+      infrastructure-changed:
+        description: "Infrastructure changed"
+        required: true
+        type: boolean
+      migrations-changed:
+        description: "Migrations changed"
+        required: true
+      assistant-changed:
+        description: "Assistant changed"
+        required: true
+        type: boolean
+      knowledge-changed:
+        description: "Knowledge changed"
+        required: true
+        type: boolean
 
 permissions:
   contents: read
   packages: write
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    outputs:
+      infrastructure-changed: ${{ inputs.infrastructure-changed }}
+      migrations-changed: ${{ inputs.migrations-changed }}
+      assistant-changed: ${{ inputs.assistant-changed }}
+      knowledge-changed: ${{ inputs.knowledge-changed }}
+    steps:
+      - run: |
+          echo "Detecting changes..."
+          echo "Infrastructure changed: ${{ inputs.infrastructure-changed }}"
+          echo "Migrations changed: ${{ inputs.migrations-changed }}"
+          echo "Assistant changed: ${{ inputs.assistant-changed }}"
+          echo "Knowledge changed: ${{ inputs.knowledge-changed }}"
+
   provision-infrastructure-staging:
     runs-on: ubuntu-latest
     environment: staging
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.infrastructure-changed == 'true'
     steps:
       - run: |
           echo "Provisioning infrastructure..."
 
   apply-migrations-staging:
     runs-on: ubuntu-latest
-    needs: provision-infrastructure-staging
+    needs: [detect-changes, provision-infrastructure-staging]
+    if: |
+      needs.detect-changes.outputs.migrations-changed == 'true' &&
+      (needs.provision-infrastructure-staging.result == 'success' || needs.provision-infrastructure-staging.result == 'skipped')
     environment: staging
     steps:
       - run: |
@@ -25,6 +63,10 @@ jobs:
 
   build-assistant-image:
     uses: ./.github/workflows/reusable-build-docker.yml
+    needs: [detect-changes, apply-migrations-staging]
+    if: |
+      needs.detect-changes.outputs.assistant-changed == 'true' &&
+      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped')
     with:
       image-name: aiasst-api
       context: ./assistant
@@ -33,7 +75,8 @@ jobs:
   deploy-assistant-image-staging:
     runs-on: ubuntu-latest
     environment: staging
-    needs: [build-assistant-image, apply-migrations-staging]
+    needs: [build-assistant-image]
+    if: needs.build-assistant-image.result == 'success'
     outputs:
       image-name-with-digest: ${{ needs.build-assistant-image.outputs.image-name-with-digest }}
     steps:
@@ -42,7 +85,10 @@ jobs:
 
   build-cleanup-job-image:
     uses: ./.github/workflows/reusable-build-docker.yml
-    needs: apply-migrations-staging
+    needs: [detect-changes, apply-migrations-staging]
+    if: |
+      needs.detect-changes.outputs.assistant-changed == 'true' &&
+      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped')
     with:
       image-name: aiasst-cleanup-job
       context: ./assistant
@@ -51,7 +97,8 @@ jobs:
   deploy-cleanup-job-image-staging:
     runs-on: ubuntu-latest
     environment: staging
-    needs: [build-cleanup-job-image, apply-migrations-staging]
+    needs: [build-cleanup-job-image]
+    if: needs.build-cleanup-job-image.result == 'success'
     outputs:
       image-name-with-digest: ${{ needs.build-cleanup-job-image.outputs.image-name-with-digest }}
     steps:
@@ -60,7 +107,10 @@ jobs:
 
   build-knowledge-image:
     uses: ./.github/workflows/reusable-build-docker.yml
-    needs: apply-migrations-staging
+    needs: [detect-changes, apply-migrations-staging]
+    if: |
+      needs.detect-changes.outputs.knowledge-changed == 'true' &&
+      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped')
     with:
       image-name: aiasst-knowledge
       context: ./knowledge-search
@@ -69,7 +119,8 @@ jobs:
   deploy-knowledge-image-staging:
     runs-on: ubuntu-latest
     environment: staging
-    needs: [build-knowledge-image, apply-migrations-staging]
+    needs: [build-knowledge-image]
+    if: needs.build-knowledge-image.result == 'success'
     outputs:
       image-name-with-digest: ${{ needs.build-knowledge-image.outputs.image-name-with-digest }}
     steps:
@@ -92,14 +143,20 @@ jobs:
   provision-infrastructure-production:
     runs-on: ubuntu-latest
     environment: production
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.infrastructure-changed == 'true'
     steps:
       - run: |
           echo "Provisioning infrastructure..."
 
   apply-migrations-production:
     runs-on: ubuntu-latest
-    needs: provision-infrastructure-production
+    needs: [detect-changes, provision-infrastructure-production]
     environment: production
+    if: |
+      needs.detect-changes.outputs.migrations-changed == 'true' &&
+      (needs.provision-infrastructure-production.result == 'success' || needs.provision-infrastructure-production.result == 'skipped')
     steps:
       - run: |
           echo "Applying migrations..."
