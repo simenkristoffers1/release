@@ -8,6 +8,21 @@ permissions:
   packages: write
 
 jobs:
+  provision-infrastructure-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - run: |
+          echo "Provisioning infrastructure..."
+
+  apply-migrations-staging:
+    runs-on: ubuntu-latest
+    needs: provision-infrastructure-staging
+    environment: staging
+    steps:
+      - run: |
+          echo "Applying migrations..."
+
   build-assistant-image:
     uses: ./.github/workflows/reusable-build-docker.yml
     with:
@@ -18,7 +33,7 @@ jobs:
   deploy-assistant-image-staging:
     runs-on: ubuntu-latest
     environment: staging
-    needs: build-assistant-image
+    needs: [build-assistant-image, apply-migrations-staging]
     outputs:
       image-name-with-digest: ${{ needs.build-assistant-image.outputs.image-name-with-digest }}
     steps:
@@ -27,6 +42,7 @@ jobs:
 
   build-cleanup-job-image:
     uses: ./.github/workflows/reusable-build-docker.yml
+    needs: apply-migrations-staging
     with:
       image-name: aiasst-cleanup-job
       context: ./assistant
@@ -35,7 +51,7 @@ jobs:
   deploy-cleanup-job-image-staging:
     runs-on: ubuntu-latest
     environment: staging
-    needs: build-cleanup-job-image
+    needs: [build-cleanup-job-image, apply-migrations-staging]
     outputs:
       image-name-with-digest: ${{ needs.build-cleanup-job-image.outputs.image-name-with-digest }}
     steps:
@@ -44,6 +60,7 @@ jobs:
 
   build-knowledge-image:
     uses: ./.github/workflows/reusable-build-docker.yml
+    needs: apply-migrations-staging
     with:
       image-name: aiasst-knowledge
       context: ./knowledge-search
@@ -52,7 +69,7 @@ jobs:
   deploy-knowledge-image-staging:
     runs-on: ubuntu-latest
     environment: staging
-    needs: build-knowledge-image
+    needs: [build-knowledge-image, apply-migrations-staging]
     outputs:
       image-name-with-digest: ${{ needs.build-knowledge-image.outputs.image-name-with-digest }}
     steps:
@@ -72,10 +89,30 @@ jobs:
       - run: |
           echo "Waiting for production approval..."
 
+  provision-infrastructure-production:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - run: |
+          echo "Provisioning infrastructure..."
+
+  apply-migrations-production:
+    runs-on: ubuntu-latest
+    needs: provision-infrastructure-production
+    environment: production
+    steps:
+      - run: |
+          echo "Applying migrations..."
+
   test-production:
     runs-on: ubuntu-latest
     environment: production
-    needs: wait-for-production-approval
+    needs:
+      [
+        wait-for-production-approval,
+        provision-infrastructure-production,
+        apply-migrations-production,
+      ]
     steps:
       - run: |
           echo "Testing assistant in production..."
@@ -86,6 +123,8 @@ jobs:
     needs:
       [
         test-production,
+        provision-infrastructure-production,
+        apply-migrations-production,
         deploy-assistant-image-staging,
         deploy-cleanup-job-image-staging,
         deploy-knowledge-image-staging,
