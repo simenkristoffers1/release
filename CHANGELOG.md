@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/simenkristoffers1/release/compare/assistant-v1.1.0...assistant-v1.1.1) (2025-07-30)
+
+
+### Bug Fixes
+
+* import system in program.cs ([91f4dfb](https://github.com/simenkristoffers1/release/commit/91f4dfb54189226608d9d8cd6d148352b91b42f9))
+
 ## [1.1.0](https://github.com/simenkristoffers1/release/compare/assistant-v1.0.1...assistant-v1.1.0) (2025-07-30)
 
 
