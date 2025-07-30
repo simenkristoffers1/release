@@ -35,6 +35,6 @@ jobs:
       attestations: write
       id-token: write
     with:
-      environment: ${{ needs.release-please.outputs.release_created == 'true' && 'production' || 'staging' }}
-      release_tag: ${{ needs.release-please.outputs.tag_name }}
+      environment: ${{ needs.release.outputs.release_created == 'true' && 'production' || 'staging' }}
+      release_tag: ${{ needs.release.outputs.tag_name }}
     secrets: inherit
