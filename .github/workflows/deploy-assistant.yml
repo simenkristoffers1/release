@@ -41,7 +41,7 @@ jobs:
 
   wait-for-production-approval:
     runs-on: ubuntu-latest
-    environment: production
+    environment: production-approval
     needs: test-staging
     steps:
       - run: |
