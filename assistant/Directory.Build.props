@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <Version>2.0.1</Version>
+    <Version>0.0.1</Version>
     <Company>Visma Software Nordics AS</Company>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
