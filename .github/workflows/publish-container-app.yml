@@ -1,0 +1,34 @@
+name: Publish Azure Container App
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "The environment to publish to"
+        required: true
+        type: string
+      resource-group:
+        description: "The resource group to publish to"
+        required: true
+        type: string
+      container-app-name:
+        description: "The name of the container app to publish"
+        required: true
+        type: string
+      image-name:
+        description: "The name of the image to publish"
+        required: true
+        type: string
+
+jobs:
+  publish-container-app:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - run: |
+          echo "Publishing container app..."
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Image name: ${{ inputs.image_name }}"

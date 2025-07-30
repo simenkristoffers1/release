@@ -74,15 +74,15 @@ jobs:
       file: ./assistant/Dockerfile
 
   deploy-assistant-image-staging:
-    runs-on: ubuntu-latest
-    environment: staging
-    needs: [build-assistant-image]
+    uses: ./.github/workflows/publish-container-app.yml
     if: needs.build-assistant-image.result == 'success'
-    outputs:
-      image-name-with-digest: ${{ needs.build-assistant-image.outputs.image-name-with-digest }}
-    steps:
-      - run: |
-          echo "Deploying assistant image ${{ needs.build-assistant-image.outputs.image-name-with-digest }} to staging..."
+    needs: [build-assistant-image]
+    with:
+      environment: staging
+      resource-group: aiasst-staging
+      container-app-name: aiasst-api
+      image-name: ${{ needs.build-assistant-image.outputs.image-name-with-digest }}
+    secrets: inherit
 
   build-cleanup-job-image:
     uses: ./.github/workflows/reusable-build-docker.yml
@@ -94,17 +94,6 @@ jobs:
       image-name: aiasst-cleanup-job
       context: ./assistant
       file: ./assistant/Dockerfile.ConversationCleanupJob
-
-  deploy-cleanup-job-image-staging:
-    runs-on: ubuntu-latest
-    environment: staging
-    needs: [build-cleanup-job-image]
-    if: needs.build-cleanup-job-image.result == 'success'
-    outputs:
-      image-name-with-digest: ${{ needs.build-cleanup-job-image.outputs.image-name-with-digest }}
-    steps:
-      - run: |
-          echo "Deploying cleanup job image ${{ needs.build-cleanup-job-image.outputs.image-name-with-digest }} to staging..."
 
   build-knowledge-image:
     uses: ./.github/workflows/reusable-build-docker.yml
@@ -118,25 +107,21 @@ jobs:
       file: ./knowledge-search/Dockerfile
 
   deploy-knowledge-image-staging:
-    runs-on: ubuntu-latest
-    environment: staging
-    needs: [build-knowledge-image]
+    uses: ./.github/workflows/publish-container-app.yml
     if: needs.build-knowledge-image.result == 'success'
-    outputs:
-      image-name-with-digest: ${{ needs.build-knowledge-image.outputs.image-name-with-digest }}
-    steps:
-      - run: |
-          echo "Deploying knowledge image ${{ needs.build-knowledge-image.outputs.image-name-with-digest }} to staging..."
+    needs: [build-knowledge-image]
+    with:
+      environment: staging
+      resource-group: aiasst-staging
+      container-app-name: aiasst-knowledge
+      image-name: ${{ needs.build-knowledge-image.outputs.image-name-with-digest }}
+    secrets: inherit
 
   wait-for-production-approval:
     runs-on: ubuntu-latest
     environment: production-approval
-    needs:
-      [
-        deploy-assistant-image-staging,
-        deploy-cleanup-job-image-staging,
-        deploy-knowledge-image-staging,
-      ]
+    needs: [deploy-assistant-image-staging, deploy-knowledge-image-staging]
+    if: always()
     steps:
       - run: |
           echo "Waiting for production approval..."
@@ -184,14 +169,11 @@ jobs:
         provision-infrastructure-production,
         apply-migrations-production,
         deploy-assistant-image-staging,
-        deploy-cleanup-job-image-staging,
         deploy-knowledge-image-staging,
       ]
     steps:
       - run: |
           echo "Deploying assistant to production..."
-          echo "assistant: ${{ needs.deploy-assistant-image-staging.outputs.image-name-with-digest }}"
-          echo "cleanup-job: ${{ needs.deploy-cleanup-job-image-staging.outputs.image-name-with-digest }}"
           echo "knowledge: ${{ needs.deploy-knowledge-image-staging.outputs.image-name-with-digest }}"
 
   # debug:
