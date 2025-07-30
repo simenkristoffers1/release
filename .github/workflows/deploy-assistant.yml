@@ -47,7 +47,7 @@ jobs:
     environment: staging
     needs: detect-changes
     if: |
-      needs.detect-changes.outputs.infrastructure-changed == 'true'
+      (always() && needs.detect-changes.outputs.infrastructure-changed == 'true')
     steps:
       - run: |
           echo "Provisioning infrastructure..."
@@ -56,8 +56,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [detect-changes, provision-infrastructure-staging]
     if: |
-      needs.detect-changes.outputs.migrations-changed == 'true' &&
-      needs.provision-infrastructure-staging.result != 'failure'
+      (always() && needs.detect-changes.outputs.migrations-changed == 'true' &&
+      (needs.provision-infrastructure-staging.result != 'success' || needs.provision-infrastructure-staging.result == 'skipped'))
     environment: staging
     steps:
       - run: |
@@ -67,8 +67,8 @@ jobs:
     uses: ./.github/workflows/reusable-build-docker.yml
     needs: [detect-changes, apply-migrations-staging]
     if: |
-      needs.detect-changes.outputs.assistant-changed == 'true' &&
-      needs.apply-migrations-staging.result != 'failure'
+      (always() && needs.detect-changes.outputs.assistant-changed == 'true' &&
+      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
     with:
       image-name: aiasst-api
       context: ./assistant
@@ -76,7 +76,7 @@ jobs:
 
   deploy-assistant-image-staging:
     uses: ./.github/workflows/publish-container-app.yml
-    if: needs.build-assistant-image.result == 'success'
+    if: always() && needs.build-assistant-image.result == 'success'
     needs: [build-assistant-image]
     with:
       environment: staging
@@ -89,8 +89,8 @@ jobs:
     uses: ./.github/workflows/reusable-build-docker.yml
     needs: [detect-changes, apply-migrations-staging]
     if: |
-      needs.detect-changes.outputs.assistant-changed == 'true' &&
-      needs.apply-migrations-staging.result != 'failure'
+      (always() && needs.detect-changes.outputs.assistant-changed == 'true' &&
+      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
     with:
       image-name: aiasst-cleanup-job
       context: ./assistant
@@ -100,8 +100,8 @@ jobs:
     uses: ./.github/workflows/reusable-build-docker.yml
     needs: [detect-changes, apply-migrations-staging]
     if: |
-      needs.detect-changes.outputs.knowledge-changed == 'true' &&
-      needs.apply-migrations-staging.result != 'failure'
+      (always() && needs.detect-changes.outputs.knowledge-changed == 'true' &&
+      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
     with:
       image-name: aiasst-knowledge
       context: ./knowledge-search
@@ -109,7 +109,7 @@ jobs:
 
   deploy-knowledge-image-staging:
     uses: ./.github/workflows/publish-container-app.yml
-    if: needs.build-knowledge-image.result == 'success'
+    if: always() && needs.build-knowledge-image.result == 'success'
     needs: [build-knowledge-image]
     with:
       environment: staging
@@ -131,7 +131,7 @@ jobs:
     environment: production
     needs: [detect-changes, wait-for-production-approval]
     if: |
-      needs.detect-changes.outputs.infrastructure-changed == 'true'
+      (always() && needs.detect-changes.outputs.infrastructure-changed == 'true')
     steps:
       - run: |
           echo "Provisioning infrastructure..."
@@ -141,8 +141,8 @@ jobs:
     needs: [detect-changes, provision-infrastructure-production]
     environment: production
     if: |
-      needs.detect-changes.outputs.migrations-changed == 'true' &&
-      needs.provision-infrastructure-production.result != 'failure'
+      (always() && needs.detect-changes.outputs.migrations-changed == 'true' &&
+      (needs.provision-infrastructure-production.result == 'success' || needs.provision-infrastructure-production.result == 'skipped'))
     steps:
       - run: |
           echo "Applying migrations..."
