@@ -123,6 +123,8 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=staging
             type=sha
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
@@ -144,8 +146,8 @@ jobs:
       - name: Pull pre-release and tag as latest (production)
         if: ${{ inputs.environment == 'production' }}
         run: |
-          docker pull ${{ env.IMAGE_NAME }}:latest
-          docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
+          docker pull ${{ env.IMAGE_NAME }}:staging
+          docker tag ${{ env.IMAGE_NAME }}:staging ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
           docker push ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
 
       - run: echo "Deploying assistant..."
@@ -179,6 +181,8 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=staging
             type=sha
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
@@ -200,8 +204,8 @@ jobs:
       - name: Pull pre-release and tag as latest (production)
         if: ${{ inputs.environment == 'production' }}
         run: |
-          docker pull ${{ env.IMAGE_NAME }}:latest
-          docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
+          docker pull ${{ env.IMAGE_NAME }}:staging
+          docker tag ${{ env.IMAGE_NAME }}:staging ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
           docker push ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
       - uses: actions/checkout@v4
       - run: echo "Deploying knowledge-search..."
