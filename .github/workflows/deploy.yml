@@ -150,6 +150,16 @@ jobs:
           docker tag ${{ env.IMAGE_NAME }}:staging ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
           docker push ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
 
+      # --- MODIFIED STEPS FOR PRODUCTION ---
+      - name: Install crane
+        if: ${{ inputs.environment == 'production' }}
+        uses: sigstore/cosign-installer@v3.5.0
+
+      - name: Tag staging image as production release
+        if: ${{ inputs.environment == 'production' }}
+        run: |
+          crane tag ${{ env.IMAGE_NAME }}:staging ${{ inputs.release_version }}
+      # --- END OF MODIFICATIONS ---
       - run: echo "Deploying assistant..."
 
   deploy-knowledge-search:
