@@ -151,9 +151,8 @@ jobs:
           docker push ${{ env.IMAGE_NAME }}:${{ inputs.release_version }}
 
       # --- MODIFIED STEPS FOR PRODUCTION ---
-      - name: Install crane
+      - uses: imjasonh/setup-crane@v0.1
         if: ${{ inputs.environment == 'production' }}
-        uses: sigstore/cosign-installer@v3.5.0
 
       - name: Tag staging image as production release
         if: ${{ inputs.environment == 'production' }}
