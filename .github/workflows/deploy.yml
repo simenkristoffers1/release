@@ -18,7 +18,7 @@ jobs:
   precheck:
     runs-on: ubuntu-latest
     outputs:
-      environment: ${{ github.event_name == 'push' && 'staging' || 'production' }}
+      environment: ${{ github.event_name == 'release' && 'production' || 'staging' }}
       infrastructure-changed: ${{ steps.check-changes.outputs.infrastructure-changed }}
       migrations-changed: ${{ steps.check-changes.outputs.migrations-changed }}
       assistant-changed: ${{ steps.check-changes.outputs.assistant-changed }}
