@@ -1,0 +1,127 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "The target environment (e.g., staging, production)"
+        required: true
+        type: string
+    secrets:
+      AZURE_IDENTITY_DBMIGRATE_CLIENT_ID:
+        required: true
+      AZURE_IDENTITY_DBMIGRATE_TENANT_ID:
+        required: true
+      AZURE_IDENTITY_DBMIGRATE_SUBSCRIPTION_ID:
+        required: true
+      DB_HOST:
+        required: true
+      DB_USER:
+        required: true
+      DB_NAME:
+        required: true
+
+jobs:
+  run-migration:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    defaults:
+      run:
+        working-directory: ./assistant/src/DbUpMigrator
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+    #   - name: Login to Azure
+    #     uses: azure/login@v2
+    #     with:
+    #       client-id: ${{ secrets.AZURE_IDENTITY_DBMIGRATE_CLIENT_ID }}
+    #       tenant-id: ${{ secrets.AZURE_IDENTITY_DBMIGRATE_TENANT_ID }}
+    #       subscription-id: ${{ secrets.AZURE_IDENTITY_DBMIGRATE_SUBSCRIPTION_ID }}
+
+    #   - name: Setup .NET SDK
+    #     uses: actions/setup-dotnet@v4
+    #     with:
+    #       dotnet-version: 9.0.x
+    #       cache: true
+    #       cache-dependency-path: "**/packages.lock.json"
+
+    #   - name: Restore .NET dependencies
+    #     run: dotnet restore
+
+    #   - name: Run DbUp schema migrations
+    #     run: dotnet run
+    #     env:
+    #       DB_HOST: ${{ secrets.DB_HOST }}
+    #       DB_PORT: 5432
+    #       DB_USERNAME: ${{ secrets.DB_USER }}
+    #       DB_DATABASE: ${{ secrets.DB_NAME }}
+    #       ASPNETCORE_ENVIRONMENT: ${{ vars.ASPNETCORE_ENVIRONMENT }}
+
+    #   - name: Retrieve access token for Azure
+    #     id: get-access-token
+    #     run: |
+    #       ACCESS_TOKEN=$(az account get-access-token --resource https://ossrdbms-aad.database.windows.net --query accessToken --output tsv)
+    #       echo "Found access token: $ACCESS_TOKEN"
+    #       echo "ACCESS_TOKEN=$ACCESS_TOKEN" >> $GITHUB_ENV
+
+    #   - name: Grant database roles to Managed Identities
+    #     env:
+    #       PGPASSWORD: ${{ env.ACCESS_TOKEN }}
+    #     run: |
+    #       declare -A ROLE_MAP=(
+    #       ["id-aiasst-api"]="api_user"
+    #       ["id-aiasst-search"]="search_user"
+    #       ["id-aiasst-indexation"]="indexation_user"
+    #       ["id-aiasst-cleanup"]="cleanup_user"
+    #       )
+
+    #       for PREFIX in "${!ROLE_MAP[@]}"; do
+    #       ROLE="${ROLE_MAP[$PREFIX]}"
+    #       echo "Processing identity: $PREFIX (role: $ROLE)"
+
+    #       IDENTITY_NAME=$(az identity list --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} --query "[?starts_with(name, '$PREFIX')].name" -o tsv | head -n 1)
+
+    #       if [ -z "$IDENTITY_NAME" ]; then
+    #           echo "ERROR: No managed identity found with prefix '$PREFIX'"
+    #           exit 1
+    #       fi
+
+    #       echo "Found identity: $IDENTITY_NAME"
+
+    #       psql "host=${{ secrets.DB_HOST }} port=5432 dbname=postgres user=${{ secrets.DB_USER }} sslmode=require" <<EOF
+    #       DO \$\$
+    #       BEGIN
+    #       IF NOT EXISTS (SELECT 1 FROM pg_user WHERE usename = '$IDENTITY_NAME') THEN
+    #           RAISE NOTICE 'Creating principal $IDENTITY_NAME';
+    #           PERFORM * FROM pgaadauth_create_principal('$IDENTITY_NAME', false, false);
+    #       ELSE
+    #           RAISE NOTICE 'Principal $IDENTITY_NAME already exists';
+    #       END IF;
+    #       END
+    #       \$\$;
+
+    #       -- Check if role is already granted
+    #       DO \$\$
+    #       BEGIN
+    #       IF NOT EXISTS (
+    #           SELECT 1
+    #           FROM pg_roles r
+    #           JOIN pg_auth_members m ON r.oid = m.roleid
+    #           JOIN pg_roles u ON u.oid = m.member
+    #           WHERE r.rolname = '$ROLE' AND u.rolname = '$IDENTITY_NAME'
+    #       ) THEN
+    #           RAISE NOTICE 'Granting $ROLE to $IDENTITY_NAME';
+    #           EXECUTE 'GRANT $ROLE TO "$IDENTITY_NAME"';
+    #       ELSE
+    #           RAISE NOTICE 'Role $ROLE already granted to $IDENTITY_NAME';
+    #       END IF;
+    #       END
+    #       \$\$;
+    #       EOF
+
+    #       done

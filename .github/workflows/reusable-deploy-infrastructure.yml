@@ -1,0 +1,48 @@
+name: Reusable Deploy Infrastructure
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Environment to deploy to (e.g., staging, production)"
+        required: true
+        type: string
+    secrets:
+      AZURE_IDENTITY_DEPLOY_CLIENT_ID:
+        required: true
+      AZURE_IDENTITY_DEPLOY_TENANT_ID:
+        required: true
+      AZURE_IDENTITY_DEPLOY_SUBSCRIPTION_ID:
+        required: true
+
+jobs:
+  deploy-infrastructure:
+    name: "Deploy ${{ inputs.environment }} infrastructure"
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      PARAM_FILE: ${{ inputs.environment == 'production' && './infrastructure/production.bicepparam' || './infrastructure/staging.bicepparam' }}
+
+    steps:
+      - uses: actions/checkout@v4
+    #   - uses: azure/login@v2
+    #     with:
+    #       client-id: ${{ secrets.AZURE_IDENTITY_DEPLOY_CLIENT_ID }}
+    #       tenant-id: ${{ secrets.AZURE_IDENTITY_DEPLOY_TENANT_ID }}
+    #       subscription-id: ${{ secrets.AZURE_IDENTITY_DEPLOY_SUBSCRIPTION_ID }}
+
+    #   - uses: azure/bicep-deploy@v2
+    # with:
+    #   type: deployment
+    #   operation: create
+    #   scope: resourceGroup
+    #   subscription-id: ${{ secrets.AZURE_IDENTITY_DEPLOY_SUBSCRIPTION_ID }}
+    #   resource-group-name: ${{ vars.AZURE_RESOURCE_GROUP }}
+    #   template-file: ./infrastructure/main.bicep
+    #   parameters-file: ${{ env.PARAM_FILE }}
+    #   validation-level: providerNoRbac
