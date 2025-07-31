@@ -71,12 +71,12 @@ jobs:
       - id: set-matrix
         name: Prepare Build Matrix
         run: |
-          matrix=()
+          matrix="[]"
           if [[ "${{ needs.detect-changes.outputs.assistant-changed }}" == "true" ]]; then
-            matrix+=("assistant")
+            matrix=$(echo $matrix | jq '. + ["assistant"]')
           fi
           if [[ "${{ needs.detect-changes.outputs.knowledge-changed }}" == "true" ]]; then
-            matrix+=("knowledge")
+            matrix=$(echo $matrix | jq '. + ["knowledge"]')
           fi
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
