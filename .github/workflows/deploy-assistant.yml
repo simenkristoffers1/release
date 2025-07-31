@@ -82,7 +82,7 @@ jobs:
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
       - name: Print matrix
         run: |
-          echo "matrix=$matrix"
+          echo "matrix=${{ fromJson(steps.set-matrix.outputs.matrix) }}"
 
   build-images:
     needs: [detect-changes, prepare-build-matrix]
