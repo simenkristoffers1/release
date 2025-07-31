@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.0.0 (2025-07-31)
+
+
+### Features
+
+* update changelog ([f76113d](https://github.com/simenkristoffers1/release/commit/f76113d90929e4760832d134822f5f5be1bc3b8c))
+
+
+### Bug Fixes
+
+* add changelog ([81d611b](https://github.com/simenkristoffers1/release/commit/81d611b62193347b1d6490cfabbbbf88e82da32a))
+* remove component name ([e97f670](https://github.com/simenkristoffers1/release/commit/e97f670ad49bee41f262eb2ce3b4f2b42e64396d))
+* remove package name ([ec258b2](https://github.com/simenkristoffers1/release/commit/ec258b22525303af69f53b98ad54d206f8ff6b80))
+* update changelog ([14866a0](https://github.com/simenkristoffers1/release/commit/14866a000afd516797e301aeea23cd26a2c1f986))
+* update changelog sections ([b83e10f](https://github.com/simenkristoffers1/release/commit/b83e10f0ea67a5d570ff8a839af1029bb372504b))
+
+
+### Reverts
+
+* changelog sections ([4659175](https://github.com/simenkristoffers1/release/commit/465917570f93ffbd629086f0e773b2853317f712))
+
 ## [1.1.9](https://github.com/simenkristoffers1/release/compare/assistant-v1.1.8...assistant-v1.1.9) (2025-07-30)
 
 
