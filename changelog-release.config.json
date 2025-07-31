@@ -7,7 +7,8 @@
     "pull-request-header": "📢 Automated weekly changelog update.",
     "packages": {
         ".": {
-            "release-type": "simple"
+            "release-type": "simple",
+            "initial-version": "2.0.0"
         }
     },
     "changelog-sections": [
