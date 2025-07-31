@@ -3,5 +3,11 @@
     "bootstrap-sha": "66e9087f91cd336381ab12c3c85f021bf2794e22",
     "include-component-in-tag": true,
     "tag-separator": "@",
-    "bump-minor-pre-major": true
+    "bump-minor-pre-major": true,
+    "packages": {
+        ".": {
+            "component": "changelog",
+            "release-type": "simple"
+        }
+    }
 }
