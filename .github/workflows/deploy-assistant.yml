@@ -15,10 +15,12 @@ on:
         description: "Assistant changed"
         required: true
         type: boolean
+        default: false
       knowledge-changed:
         description: "Knowledge changed"
         required: true
         type: boolean
+        default: true
 
 permissions:
   id-token: write
@@ -108,8 +110,6 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.prepare-build-matrix.outputs.matrix) }}
     if: always() && ${{ needs.detect-changes.outputs.any_service_changed == 'true' }}
-    outputs:
-      ${{ matrix.component }}-output: ${{ steps.set-image-name.outputs.image-name-with-digest }}
     env:
       IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/${{ matrix.image-name }}
     steps:
@@ -142,93 +142,100 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - id: set-image-name
+
+      - id: set-output
         run: |
-          IMAGE_NAME=${{ env.IMAGE_NAME }}:${{ steps.build-push.outputs.digest }}
-          echo "image-name-with-digest=$IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "IMAGE_NAME_STAGING=${{ matrix.image-name }}:${{ steps.build-push.outputs.digest }}" >> $GITHUB_ENV
 
-  deploy-assistant-ca-staging:
-    uses: ./.github/workflows/publish-container-app.yml
-    needs: [build-images]
-    with:
-      environment: staging
-      resource-group: aiasst-staging
-      container-app-name: aiasst-api
-      image-name: aiasst-knowledge:${{ github.sha }}
-    secrets: inherit
-    if: always() && needs.build-images.result == 'success'
-
-  deploy-knowledge-ca-staging:
-    uses: ./.github/workflows/publish-container-app.yml
-    needs: [build-images]
-    with:
-      environment: staging
-      resource-group: aiasst-staging
-      container-app-name: aiasst-knowledge
-      image-name: aiasst-knowledge:${{ github.sha }}
-    secrets: inherit
-    if: always() && needs.build-images.result == 'success'
-
-  wait-for-production-approval:
+  debug:
     runs-on: ubuntu-latest
-    environment: production-approval
-    needs: [build-images]
-    if: always()
+    needs: build-images
     steps:
       - run: |
-          echo "Waiting for production approval..."
+          echo "$IMAGE_NAME_STAGING"
 
-  provision-infrastructure-production:
-    needs: [detect-changes, wait-for-production-approval]
-    uses: ./.github/workflows/reusable-deploy-infrastructure.yml
-    with:
-      environment: production
-    secrets: inherit
-    if: |
-      (always() && needs.detect-changes.outputs.infrastructure-changed == 'true')
+  # deploy-assistant-ca-staging:
+  #   uses: ./.github/workflows/publish-container-app.yml
+  #   needs: [build-images]
+  #   with:
+  #     environment: staging
+  #     resource-group: aiasst-staging
+  #     container-app-name: aiasst-api
+  #     image-name: aiasst-knowledge:${{ github.sha }}
+  #   secrets: inherit
+  #   if: always() && needs.build-images.result == 'success'
 
-  apply-migrations-production:
-    needs: [detect-changes, provision-infrastructure-production]
-    uses: ./.github/workflows/reusable-migrate-database.yml
-    with:
-      environment: production
-    secrets: inherit
-    if: |
-      (always() && needs.detect-changes.outputs.migrations-changed == 'true' &&
-      (needs.provision-infrastructure-production.result == 'success' || needs.provision-infrastructure-production.result == 'skipped'))
+  # deploy-knowledge-ca-staging:
+  #   uses: ./.github/workflows/publish-container-app.yml
+  #   needs: [build-images]
+  #   with:
+  #     environment: staging
+  #     resource-group: aiasst-staging
+  #     container-app-name: aiasst-knowledge
+  #     image-name: aiasst-knowledge:${{ github.sha }}
+  #   secrets: inherit
+  #   if: always() && needs.build-images.result == 'success'
 
-  promote-images:
-    needs: [prepare-build-matrix, build-images, apply-migrations-production]
-    strategy:
-      matrix:
-        include: ${{ fromJson(needs.prepare-build-matrix.outputs.matrix) }}
-    uses: ./.github/workflows/reusable-promote-docker.yml
-    with:
-      image-name: ${{ matrix.image-name }}
-      image-tag: staging
-      promote-to: production
-    if: |
-      (always() &&
-      (needs.apply-migrations-production.result == 'success' || needs.apply-migrations-production.result == 'skipped'))
+  # wait-for-production-approval:
+  #   runs-on: ubuntu-latest
+  #   environment: production-approval
+  #   needs: [build-images]
+  #   if: always()
+  #   steps:
+  #     - run: |
+  #         echo "Waiting for production approval..."
 
-  deploy-assistant-ca-production:
-    uses: ./.github/workflows/publish-container-app.yml
-    needs: [promote-images]
-    with:
-      environment: production
-      resource-group: aiasst-production
-      container-app-name: aiasst-api
-      image-name: aiasst-knowledge:${{ github.sha }}
-    secrets: inherit
-    if: always() && needs.promote-images.result == 'success'
+  # provision-infrastructure-production:
+  #   needs: [detect-changes, wait-for-production-approval]
+  #   uses: ./.github/workflows/reusable-deploy-infrastructure.yml
+  #   with:
+  #     environment: production
+  #   secrets: inherit
+  #   if: |
+  #     (always() && needs.detect-changes.outputs.infrastructure-changed == 'true')
 
-  deploy-knowledge-ca-production:
-    uses: ./.github/workflows/publish-container-app.yml
-    needs: [promote-images]
-    with:
-      environment: production
-      resource-group: aiasst-production
-      container-app-name: aiasst-knowledge
-      image-name: aiasst-knowledge:${{ github.sha }}
-    secrets: inherit
-    if: always() && needs.promote-images.result == 'success'
+  # apply-migrations-production:
+  #   needs: [detect-changes, provision-infrastructure-production]
+  #   uses: ./.github/workflows/reusable-migrate-database.yml
+  #   with:
+  #     environment: production
+  #   secrets: inherit
+  #   if: |
+  #     (always() && needs.detect-changes.outputs.migrations-changed == 'true' &&
+  #     (needs.provision-infrastructure-production.result == 'success' || needs.provision-infrastructure-production.result == 'skipped'))
+
+  # promote-images:
+  #   needs: [prepare-build-matrix, build-images, apply-migrations-production]
+  #   strategy:
+  #     matrix:
+  #       include: ${{ fromJson(needs.prepare-build-matrix.outputs.matrix) }}
+  #   uses: ./.github/workflows/reusable-promote-docker.yml
+  #   with:
+  #     image-name: ${{ matrix.image-name }}
+  #     image-tag: staging
+  #     promote-to: production
+  #   if: |
+  #     (always() &&
+  #     (needs.apply-migrations-production.result == 'success' || needs.apply-migrations-production.result == 'skipped'))
+
+  # deploy-assistant-ca-production:
+  #   uses: ./.github/workflows/publish-container-app.yml
+  #   needs: [promote-images]
+  #   with:
+  #     environment: production
+  #     resource-group: aiasst-production
+  #     container-app-name: aiasst-api
+  #     image-name: aiasst-knowledge:${{ github.sha }}
+  #   secrets: inherit
+  #   if: always() && needs.promote-images.result == 'success'
+
+  # deploy-knowledge-ca-production:
+  #   uses: ./.github/workflows/publish-container-app.yml
+  #   needs: [promote-images]
+  #   with:
+  #     environment: production
+  #     resource-group: aiasst-production
+  #     container-app-name: aiasst-knowledge
+  #     image-name: aiasst-knowledge:${{ github.sha }}
+  #   secrets: inherit
+  #   if: always() && needs.promote-images.result == 'success'
