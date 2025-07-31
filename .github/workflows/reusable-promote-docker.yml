@@ -3,15 +3,15 @@ name: Promote Docker Image
 on:
   workflow_call:
     inputs:
-      image_name:
+      image-name:
         description: "The name of the image to promote"
         required: true
         type: string
-      image_tag:
+      image-tag:
         description: "The tag of the image to promote"
         required: true
         type: string
-      promote_to:
+      promote-to:
         description: "The version of the image to promote"
         required: true
         type: string
@@ -29,12 +29,12 @@ jobs:
       contents: read
       packages: write
     env:
-      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/${{ inputs.image_name }}
+      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}
     steps:
       - uses: imjasonh/setup-crane@v0.1
       - run: |
-          crane tag ${{ env.IMAGE_NAME }}:${{ inputs.image_tag }} ${{ inputs.promote_to }}
+          crane tag ${{ env.IMAGE_NAME }}:${{ inputs.image-tag }} ${{ inputs.promote-to }}
       - id: set-promoted-image
         run: |
-          PROMOTED_IMAGE="${{ env.IMAGE_NAME }}:${{ inputs.promote_to }}"
+          PROMOTED_IMAGE="${{ env.IMAGE_NAME }}:${{ inputs.promote-to }}"
           echo "promoted-image=$PROMOTED_IMAGE" >> $GITHUB_OUTPUT
