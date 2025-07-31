@@ -72,11 +72,11 @@ jobs:
         name: Prepare Build Matrix
         run: |
           matrix="[]"
-          if [[ "${{ needs.detect-changes.outputs.assistant-changed }}" == "true" ]]; then
-            matrix=$(echo "$matrix" | jq '. += ["assistant"]')
+          if [[ "true" == "true" ]]; then
+            matrix=$(echo "$matrix" | jq -c '. += ["assistant"]')
           fi
-          if [[ "${{ needs.detect-changes.outputs.knowledge-changed }}" == "true" ]]; then
-            matrix=$(echo "$matrix" | jq '. += ["knowledge"]')
+          if [[ "true" == "true" ]]; then
+            matrix=$(echo "$matrix" | jq -c '. += ["knowledge"]')
           fi
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
