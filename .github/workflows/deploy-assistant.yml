@@ -80,9 +80,11 @@ jobs:
             matrix=$(echo "$matrix" | jq -c '. += ["knowledge"]')
           fi
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
-      - name: Print matrix
+      - name: Print each item in the matrix
         run: |
-          echo "matrix=${{ fromJson(steps.set-matrix.outputs.matrix) }}"
+          for item in ${{ join(fromJson(steps.set-matrix.outputs.matrix), ' ') }}; do
+            echo "$item"
+          done
 
   build-images:
     needs: [detect-changes, prepare-build-matrix]
