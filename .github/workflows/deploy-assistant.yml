@@ -73,10 +73,10 @@ jobs:
         run: |
           matrix="[]"
           if [[ "${{ needs.detect-changes.outputs.assistant-changed }}" == "true" ]]; then
-            matrix=$(echo $matrix | jq '. + ["assistant"]')
+            matrix=$(echo "$matrix" | jq '. += ["assistant"]')
           fi
           if [[ "${{ needs.detect-changes.outputs.knowledge-changed }}" == "true" ]]; then
-            matrix=$(echo $matrix | jq '. + ["knowledge"]')
+            matrix=$(echo "$matrix" | jq '. += ["knowledge"]')
           fi
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
 
