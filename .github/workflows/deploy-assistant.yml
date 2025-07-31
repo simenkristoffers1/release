@@ -143,16 +143,37 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - id: set-output
+      - name: Write output to file
         run: |
-          echo "IMAGE_NAME_STAGING=${{ matrix.image-name }}:${{ steps.build-push.outputs.digest }}" >> $GITHUB_ENV
+          echo '${{ matrix.image-name }}:${{ steps.build-push.outputs.digest }}' >> image-output.txt
+
+      - name: Upload output as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-outputs
+          path: image-output.txt
 
   debug:
     runs-on: ubuntu-latest
     needs: build-images
     steps:
-      - run: |
-          echo "$IMAGE_NAME_STAGING"
+      - name: Download all image outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: image-outputs
+          path: .
+
+      - name: Combine outputs to JSON
+        run: |
+          # Combine all output files into a JSON array
+          jq -Rn '[inputs | split(":") | {name: .[0], digest: .[1]}]' image-output.txt > images.json
+          cat images.json
+
+      - name: Upload JSON object
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-outputs-json
+          path: images.json
 
   # deploy-assistant-ca-staging:
   #   uses: ./.github/workflows/publish-container-app.yml
