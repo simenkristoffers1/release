@@ -100,7 +100,8 @@ jobs:
     needs: [prepare-build-matrix]
     strategy:
       fail-fast: true
-      matrix: ${{ fromJson(needs.prepare-build-matrix.outputs.matrix) }}
+      matrix:
+        include: ${{ fromJson(needs.prepare-build-matrix.outputs.matrix) }}
     with:
       image-name: ${{ matrix.image-name }}
       context: ${{ matrix.context }}
