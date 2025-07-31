@@ -19,47 +19,14 @@ on:
         description: "The name of the image to publish"
         required: true
         type: string
-      context:
-        description: "The context of the image to publish"
-        required: true
-        type: string
-      file:
-        description: "The file of the image to publish"
-        required: true
-        type: string
-      is-container-app-job:
-        description: "Whether the job is a container app job"
-        required: true
-        type: boolean
 
 jobs:
-  build-image:
-    uses: ./.github/workflows/reusable-build-docker.yml
-    with:
-      image-name: ${{ inputs.image-name }}
-      context: ${{ inputs.context }}
-      file: ${{ inputs.file }}
-      image-tag: staging
-    if: ${{ inputs.environment == 'staging' }}
-
-  promote-image:
-    uses: ./.github/workflows/reusable-promote-docker.yml
-    with:
-      image-name: ${{ inputs.image-name }}
-      image-tag: staging
-      promote-to: production
-    if: ${{ inputs.environment == 'production' }}
-
   publish-container-app:
     runs-on: ubuntu-latest
-    needs: [build-image, promote-image]
     environment: ${{ inputs.environment }}
     permissions:
       id-token: write
       contents: read
-    if: |
-      always() && ${{ inputs.is-container-app-job == 'false' }} &&
-      (needs.build-image.result == 'success' || needs.promote-image.result == 'success')
     steps:
       - run: |
           echo "Publishing container app..."
