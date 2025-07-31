@@ -64,11 +64,6 @@ jobs:
           echo "Applying migrations..."
 
   build-images:
-    runs-on: ubuntu-latest
-    outputs:
-      assistant-image-name: ${{ steps.build.outputs.assistant-image-name }}
-      cleanup-job-image-name: ${{ steps.build.outputs.cleanup-job-image-name }}
-      knowledge-image-name: ${{ steps.build.outputs.knowledge-image-name }}
     strategy:
       matrix:
         component: [assistant, cleanup-job, knowledge]
@@ -85,25 +80,20 @@ jobs:
             image-name: aiasst-knowledge
             context: ./knowledge-search
             file: ./knowledge-search/Dockerfile
-    steps:
-      - uses: ./.github/workflows/reusable-build-docker.yml
-        id: build
-        with:
-          image-name: ${{ matrix.image-name }}
-          context: ${{ matrix.context }}
-          file: ${{ matrix.file }}
-      - id: set-output
-        run: |
-          echo "${{ matrix.component }}-image-name=${{ steps.build.outputs.image-name-with-digest }}" >> $GITHUB_OUTPUT
+    uses: ./.github/workflows/reusable-build-docker.yml
+    with:
+      image-name: ${{ matrix.image-name }}
+      context: ${{ matrix.context }}
+      file: ${{ matrix.file }}
 
   debug:
     runs-on: ubuntu-latest
     needs: build-images
     steps:
       - run: |
-          echo "Assistant image name: ${{ needs.build-images.outputs.assistant-image-name }}"
-          echo "Cleanup job image name: ${{ needs.build-images.outputs.cleanup-job-image-name }}"
-          echo "Knowledge image name: ${{ needs.build-images.outputs.knowledge-image-name }}"
+          echo "Assistant image name: aiasst-api@${{ github.sha }}"
+          echo "Cleanup job image name: aiasst-cleanup-job@${{ github.sha }}"
+          echo "Knowledge image name: aiasst-knowledge@${{ github.sha }}"
 
   # build-assistant-image:
   #   uses: ./.github/workflows/reusable-build-docker.yml
