@@ -5,7 +5,6 @@
     "tag-separator": "@",
     "packages": {
         ".": {
-            "package-name": "changelog",
             "release-type": "simple",
             "versioning": "always-bump-major",
             "initial-version": "1"
