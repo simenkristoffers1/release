@@ -80,8 +80,11 @@ jobs:
             matrix=$(echo "$matrix" | jq -c '. += ["knowledge"]')
           fi
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
+      - name: Print matrix
+        run: |
+          echo "matrix=$matrix"
 
-  build:
+  build-images:
     needs: [detect-changes, prepare-build-matrix]
     if: needs.detect-changes.outputs.any_service_changed == 'true'
     strategy:
