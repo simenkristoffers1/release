@@ -1,4 +1,4 @@
-name: Release
+name: Generate Changelogs
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -6,22 +6,18 @@ concurrency:
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - main
-
-permissions:
-  issues: write
-  contents: write
-  pull-requests: write
 
 jobs:
-  release:
+  generate-changelogs:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: write
+      pull-requests: write
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
           token: ${{ secrets.PAT }}
-          config-file: release.config.json
+          config-file: changelog-release.config.json
           manifest-file: .release-manifest.json
