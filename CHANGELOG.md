@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/simenkristoffers1/release/compare/v1.0.0...v1.0.1) (2025-07-31)
+
+
+### 🐞 Bug Fixes
+
+* update dispatch path ([f6636ba](https://github.com/simenkristoffers1/release/commit/f6636ba655d3eb6022b9ef714efb66c40efa445d))
+
 ## 1.0.0 (2025-07-31)
 
 
