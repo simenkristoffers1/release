@@ -1,5 +1,45 @@
 # Changelog
 
+## 1.1.1 (2025-07-31)
+
+
+### Features
+
+* some new feat ([6ae3194](https://github.com/simenkristoffers1/release/commit/6ae31948230b33089cd89318911c6b925ae0586b))
+* update logger ([b8fe6a7](https://github.com/simenkristoffers1/release/commit/b8fe6a7890093b49c53d20393a74a6e9162f9748))
+
+
+### Bug Fixes
+
+* a second fix ([1fbc901](https://github.com/simenkristoffers1/release/commit/1fbc901a872885cca2bdefef3cd61200a75918ca))
+* add changelog ([81d611b](https://github.com/simenkristoffers1/release/commit/81d611b62193347b1d6490cfabbbbf88e82da32a))
+* add gitignore ([2c1b039](https://github.com/simenkristoffers1/release/commit/2c1b039952e8bc303f6be63cc6397e953db2b473))
+* import system in program.cs ([91f4dfb](https://github.com/simenkristoffers1/release/commit/91f4dfb54189226608d9d8cd6d148352b91b42f9))
+* knowledge-search ([e1de017](https://github.com/simenkristoffers1/release/commit/e1de0174014906e1bbe0d87b4acf4dc7a678975a))
+* knowledge-search ([7cf6cc0](https://github.com/simenkristoffers1/release/commit/7cf6cc008b55d67f65a02fc8d5b6fb74dc80a926))
+* knowledge-search ([1f8f712](https://github.com/simenkristoffers1/release/commit/1f8f7125e3218988ad3b543a0c845e3e65186264))
+* opacity in css ([3899504](https://github.com/simenkristoffers1/release/commit/3899504d4adae2bc8f52d7673eebcdf76e3cb721))
+* rename Class1.cs ([ccb6cb0](https://github.com/simenkristoffers1/release/commit/ccb6cb0f689dcb8b1b3073e2375e69346b829e13))
+* some change ([d4e199f](https://github.com/simenkristoffers1/release/commit/d4e199f3856db599aa0b66e47e4864a3d25c6246))
+* some change ([83ea12f](https://github.com/simenkristoffers1/release/commit/83ea12f733e11a02bdf88e225f7cdb13ab126870))
+* some fix ([5717b6a](https://github.com/simenkristoffers1/release/commit/5717b6a2873f33d52cb876b77207071c2d2f7dd7))
+* some fix ([c4309fa](https://github.com/simenkristoffers1/release/commit/c4309fae9805156b09cc22c748156cdda5a99412))
+* some new fix ([61695dd](https://github.com/simenkristoffers1/release/commit/61695dd96286660eba612f71516c95f42e43c6c5))
+* some other fix ([8169743](https://github.com/simenkristoffers1/release/commit/8169743ac01b9e0fc901f36c2a01228276abfe1d))
+* something ([136c20b](https://github.com/simenkristoffers1/release/commit/136c20b9b3383a76cb82c040c8a84a5912fad36c))
+* update api ([16a1c96](https://github.com/simenkristoffers1/release/commit/16a1c96bebd0b36e3728a0836c5e2377b0342768))
+* update changelog ([14866a0](https://github.com/simenkristoffers1/release/commit/14866a000afd516797e301aeea23cd26a2c1f986))
+* update compoents ([cd53a41](https://github.com/simenkristoffers1/release/commit/cd53a4105a9be2688e06f024bd9c2503acf652c1))
+* update knowledge search log ([1faee24](https://github.com/simenkristoffers1/release/commit/1faee248a7582a5a959312b30b833f6c2689ab62))
+* update log ([8f2ccec](https://github.com/simenkristoffers1/release/commit/8f2ccec525095b7c11d4e924957f7dc202da7c8b))
+* update log again ([e3c9f31](https://github.com/simenkristoffers1/release/commit/e3c9f3194b0db207ea77b99eca6807c7354aa9ba))
+
+
+### Miscellaneous Chores
+
+* promote chat-ui to stable version ([#50](https://github.com/simenkristoffers1/release/issues/50)) ([dce65a0](https://github.com/simenkristoffers1/release/commit/dce65a09402eaa4acec0e6a538b325461e5396be))
+* promote chat-ui to stable version ([#55](https://github.com/simenkristoffers1/release/issues/55)) ([4a61572](https://github.com/simenkristoffers1/release/commit/4a615721719ad2a4482f9249424ad895ee55e7bc))
+
 ## [1.1.9](https://github.com/simenkristoffers1/release/compare/assistant-v1.1.8...assistant-v1.1.9) (2025-07-30)
 
 
