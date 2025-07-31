@@ -91,9 +91,9 @@ jobs:
     needs: build-images
     steps:
       - run: |
-          echo "Assistant image name: aiasst-api@${{ github.sha }}"
-          echo "Cleanup job image name: aiasst-cleanup-job@${{ github.sha }}"
-          echo "Knowledge image name: aiasst-knowledge@${{ github.sha }}"
+          echo "Assistant image name: aiasst-api:${{ github.sha }}"
+          echo "Cleanup job image name: aiasst-cleanup-job:${{ github.sha }}"
+          echo "Knowledge image name: aiasst-knowledge:${{ github.sha }}"
 
   # build-assistant-image:
   #   uses: ./.github/workflows/reusable-build-docker.yml

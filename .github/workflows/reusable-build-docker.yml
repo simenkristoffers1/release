@@ -45,7 +45,7 @@ jobs:
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value=staging
-            type=sha
+            type=sha,format=long
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
       - uses: docker/build-push-action@v6
@@ -62,4 +62,5 @@ jobs:
           cache-to: type=gha,mode=max
       - id: set-image-name
         run: |
-          echo "image-name-with-digest=${{ env.IMAGE_NAME }}@${{ steps.build-push.outputs.digest }}" >> $GITHUB_OUTPUT
+          IMAGE_NAME=${{ env.IMAGE_NAME }}:${{ steps.build-push.outputs.digest }}
+          echo "image-name-with-digest=$IMAGE_NAME" >> $GITHUB_OUTPUT
