@@ -69,51 +69,43 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - id: set-matrix
-        name: Prepare Build Matrix
         run: |
           matrix="[]"
           if [[ "${{ needs.detect-changes.outputs.assistant-changed }}" == "true" ]]; then
-            matrix=$(echo "$matrix" | jq -c '. += ["assistant"]')
-            matrix=$(echo "$matrix" | jq -c '. += ["cleanup-job"]')
+            matrix=$(echo "$matrix" | jq -c '. += [{
+              "component":"assistant",
+              "image-name":"aiasst-api",
+              "context":"./assistant",
+              "file":"./assistant/Dockerfile"
+            }]')
+            matrix=$(echo "$matrix" | jq -c '. += [{
+              "component":"cleanup-job",
+              "image-name":"aiasst-cleanup-job",
+              "context":"./assistant",
+              "file":"./assistant/Dockerfile.ConversationCleanupJob"
+            }]')
           fi
           if [[ "${{ needs.detect-changes.outputs.knowledge-changed }}" == "true" ]]; then
-            matrix=$(echo "$matrix" | jq -c '. += ["knowledge"]')
+            matrix=$(echo "$matrix" | jq -c '. += [{
+              "component":"knowledge",
+              "image-name":"aiasst-knowledge",
+              "context":"./knowledge-search",
+              "file":"./knowledge-search/Dockerfile"
+            }]')
           fi
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
-      - name: Print each item in the matrix
-        run: |
-          for item in ${{ join(fromJson(steps.set-matrix.outputs.matrix), ' ') }}; do
-            echo "$item"
-          done
 
   build-images:
-    needs: [detect-changes, prepare-build-matrix]
-    if: needs.detect-changes.outputs.any_service_changed == 'true'
-    strategy:
-      fail-fast: false
-      matrix:
-        # Define services here to easily add/remove them later.
-        component: ${{ fromJson(needs.prepare-build-matrix.outputs.matrix) }}
-        include:
-          - component: assistant
-            image-name: aiasst-api
-            context: ./assistant
-            file: ./assistant/Dockerfile
-          - component: cleanup-job
-            image-name: aiasst-cleanup-job
-            context: ./assistant
-            file: ./assistant/Dockerfile.ConversationCleanupJob
-          - component: knowledge
-            image-name: aiasst-knowledge
-            context: ./knowledge-search
-            file: ./knowledge-search/Dockerfile
     uses: ./.github/workflows/reusable-build-docker.yml
+    needs: [prepare-build-matrix]
+    strategy:
+      fail-fast: true
+      matrix: ${{ fromJson(needs.prepare-build-matrix.outputs.matrix) }}
     with:
       image-name: ${{ matrix.image-name }}
       context: ${{ matrix.context }}
       file: ${{ matrix.file }}
       image-tag: staging
-      set-latest-tag: true
 
   # build-assistant-image:
   #   uses: ./.github/workflows/reusable-build-docker.yml
@@ -122,6 +114,7 @@ jobs:
   #     image-name: aiasst-api
   #     context: ./assistant
   #     file: ./assistant/Dockerfile
+  #     image-tag: staging
   #   if: |
   #     (always() && needs.detect-changes.outputs.assistant-changed == 'true' &&
   #     (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
@@ -133,6 +126,7 @@ jobs:
   #     image-name: aiasst-cleanup-job
   #     context: ./assistant
   #     file: ./assistant/Dockerfile.ConversationCleanupJob
+  #     image-tag: staging
   #   if: |
   #     (always() && needs.detect-changes.outputs.assistant-changed == 'true' &&
   #     (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
@@ -144,6 +138,7 @@ jobs:
   #     image-name: aiasst-knowledge
   #     context: ./knowledge-search
   #     file: ./knowledge-search/Dockerfile
+  #     image-tag: staging
   #   if: |
   #     (always() && needs.detect-changes.outputs.knowledge-changed == 'true' &&
   #     (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
