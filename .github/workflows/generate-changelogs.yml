@@ -11,6 +11,9 @@ on:
       - main
     paths:
       - "CHANGELOG.md"
+  schedule:
+    # Runs at 2pm UTC every Friday (change timezone if needed)
+    - cron: "0 14 * * 5"
 
 jobs:
   generate-changelogs:
@@ -23,6 +26,6 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           config-file: changelog-release.config.json
           manifest-file: .release-manifest.json
