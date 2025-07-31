@@ -15,7 +15,27 @@
         },
         {
             "type": "fix",
-            "section": "🐛 Bug Fixes"
+            "section": "🐞 Bug Fixes"
+        },
+        {
+            "type": "perf",
+            "section": "⚡ Performance"
+        },
+        {
+            "type": "refactor",
+            "section": "🔨 Refactoring"
+        },
+        {
+            "type": "docs",
+            "section": "📝 Documentation"
+        },
+        {
+            "type": "style",
+            "section": "🎨 Style"
+        },
+        {
+            "type": "chore",
+            "section": "Other"
         }
     ]
 }
