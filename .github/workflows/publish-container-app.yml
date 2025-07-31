@@ -19,10 +19,40 @@ on:
         description: "The name of the image to publish"
         required: true
         type: string
+      context:
+        description: "The context of the image to publish"
+        required: true
+        type: string
+      file:
+        description: "The file of the image to publish"
+        required: true
+        type: string
+      is-container-app-job:
+        description: "Whether the job is a container app job"
+        required: true
+        type: boolean
 
 jobs:
+  build-image:
+    if: ${{ inputs.environment == 'staging' }}
+    uses: ./.github/workflows/reusable-build-docker.yml
+    with:
+      image-name: ${{ inputs.image-name }}
+      context: ${{ inputs.context }}
+      file: ${{ inputs.file }}
+      image-tag: staging
+
+  promote-image:
+    if: ${{ inputs.environment == 'production' }}
+    uses: ./.github/workflows/reusable-promote-docker.yml
+    with:
+      image-name: ${{ inputs.image-name }}
+      image-tag: staging
+      promote-to: production
+
   publish-container-app:
     runs-on: ubuntu-latest
+    if: ${{ inputs.is-container-app-job == 'false' }}
     environment: ${{ inputs.environment }}
     permissions:
       id-token: write
