@@ -7,13 +7,13 @@ on:
         description: "Environment to deploy to (e.g., staging, production)"
         required: true
         type: string
-    secrets:
-      AZURE_IDENTITY_DEPLOY_CLIENT_ID:
-        required: true
-      AZURE_IDENTITY_DEPLOY_TENANT_ID:
-        required: true
-      AZURE_IDENTITY_DEPLOY_SUBSCRIPTION_ID:
-        required: true
+    # secrets:
+    #   AZURE_IDENTITY_DEPLOY_CLIENT_ID:
+    #     required: true
+    #   AZURE_IDENTITY_DEPLOY_TENANT_ID:
+    #     required: true
+    #   AZURE_IDENTITY_DEPLOY_SUBSCRIPTION_ID:
+    #     required: true
 
 jobs:
   deploy-infrastructure:

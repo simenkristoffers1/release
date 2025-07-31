@@ -5,19 +5,19 @@ on:
         description: "The target environment (e.g., staging, production)"
         required: true
         type: string
-    secrets:
-      AZURE_IDENTITY_DBMIGRATE_CLIENT_ID:
-        required: true
-      AZURE_IDENTITY_DBMIGRATE_TENANT_ID:
-        required: true
-      AZURE_IDENTITY_DBMIGRATE_SUBSCRIPTION_ID:
-        required: true
-      DB_HOST:
-        required: true
-      DB_USER:
-        required: true
-      DB_NAME:
-        required: true
+    # secrets:
+    #   AZURE_IDENTITY_DBMIGRATE_CLIENT_ID:
+    #     required: true
+    #   AZURE_IDENTITY_DBMIGRATE_TENANT_ID:
+    #     required: true
+    #   AZURE_IDENTITY_DBMIGRATE_SUBSCRIPTION_ID:
+    #     required: true
+    #   DB_HOST:
+    #     required: true
+    #   DB_USER:
+    #     required: true
+    #   DB_NAME:
+    #     required: true
 
 jobs:
   run-migration:
