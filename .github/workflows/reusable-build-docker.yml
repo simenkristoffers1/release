@@ -7,6 +7,15 @@ on:
         description: "Image name"
         required: true
         type: string
+      image-tag:
+        description: "Image tag"
+        required: true
+        type: string
+      set-latest-tag:
+        description: "Set latest tag"
+        required: false
+        type: boolean
+        default: true
       context:
         description: "Context"
         required: true
@@ -43,8 +52,8 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=staging
+            type=raw,value=latest,enable=${{ inputs.set-latest-tag }}
+            type=raw,value=${{ inputs.image-tag }},enable=${{ inputs.set-latest-tag != '' }}
             type=sha,format=long
         env:
           DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index

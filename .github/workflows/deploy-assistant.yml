@@ -72,11 +72,11 @@ jobs:
         name: Prepare Build Matrix
         run: |
           matrix="[]"
-          if [[ "true" == "true" ]]; then
+          if [[ "${{ needs.detect-changes.outputs.assistant-changed }}" == "true" ]]; then
             matrix=$(echo "$matrix" | jq -c '. += ["assistant"]')
             matrix=$(echo "$matrix" | jq -c '. += ["cleanup-job"]')
           fi
-          if [[ "true" == "true" ]]; then
+          if [[ "${{ needs.detect-changes.outputs.knowledge-changed }}" == "true" ]]; then
             matrix=$(echo "$matrix" | jq -c '. += ["knowledge"]')
           fi
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
@@ -84,7 +84,6 @@ jobs:
   build:
     needs: [detect-changes, prepare-build-matrix]
     if: needs.detect-changes.outputs.any_service_changed == 'true'
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -95,29 +94,21 @@ jobs:
             image-name: aiasst-api
             context: ./assistant
             file: ./assistant/Dockerfile
-            # Run this matrix leg only if its specific path changed.
-            if_changed: needs.detect-changes.outputs.assistant == 'true'
           - component: cleanup-job
             image-name: aiasst-cleanup-job
             context: ./assistant
             file: ./assistant/Dockerfile.ConversationCleanupJob
-            if_changed: needs.detect-changes.outputs.assistant == 'true'
           - component: knowledge
             image-name: aiasst-knowledge
             context: ./knowledge-search
             file: ./knowledge-search/Dockerfile
-            if_changed: needs.detect-changes.outputs.knowledge == 'true'
-    steps:
-      # This step aggregates built image names for later use.
-      - uses: actions/checkout@v4
-      - name: Build and push Docker image
-        id: build-images
-        if: ${{ matrix.if_changed }}
-        uses: ./.github/workflows/reusable-build-docker.yml
-        with:
-          image-name: ${{ matrix.image-name }}
-          context: ${{ matrix.context }}
-          file: ${{ matrix.file }}
+    uses: ./.github/workflows/reusable-build-docker.yml
+    with:
+      image-name: ${{ matrix.image-name }}
+      context: ${{ matrix.context }}
+      file: ${{ matrix.file }}
+      image-tag: staging
+      set-latest-tag: true
 
   # build-assistant-image:
   #   uses: ./.github/workflows/reusable-build-docker.yml
