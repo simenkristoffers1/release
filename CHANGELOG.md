@@ -1,5 +1,61 @@
 # Changelog
 
+## 1.0.0 (2025-07-31)
+
+
+### 🚀 Features
+
+* update changelog ([f76113d](https://github.com/simenkristoffers1/release/commit/f76113d90929e4760832d134822f5f5be1bc3b8c))
+
+
+### 🐞 Bug Fixes
+
+* add changelog ([81d611b](https://github.com/simenkristoffers1/release/commit/81d611b62193347b1d6490cfabbbbf88e82da32a))
+* remove component name ([e97f670](https://github.com/simenkristoffers1/release/commit/e97f670ad49bee41f262eb2ce3b4f2b42e64396d))
+* remove package name ([ec258b2](https://github.com/simenkristoffers1/release/commit/ec258b22525303af69f53b98ad54d206f8ff6b80))
+* update changelog ([14866a0](https://github.com/simenkristoffers1/release/commit/14866a000afd516797e301aeea23cd26a2c1f986))
+* update changelog sections ([b83e10f](https://github.com/simenkristoffers1/release/commit/b83e10f0ea67a5d570ff8a839af1029bb372504b))
+
+
+### ⚡ Performance Improvements
+
+* update ([4a9b4a2](https://github.com/simenkristoffers1/release/commit/4a9b4a2b697769c773cca3530ad756181c41dfdc))
+
+
+### ⬆️ Dependencies
+
+* something ([a61d29e](https://github.com/simenkristoffers1/release/commit/a61d29e68a14600dc069d5382c55ccab1192a3b1))
+
+
+### 📝 Documentation
+
+* update header ([5f66668](https://github.com/simenkristoffers1/release/commit/5f666688ced7a7b594b9cbe6b1c611abe5b0ab72))
+
+
+### 🎨 Code Style
+
+* update changelogs style ([cfb8f8d](https://github.com/simenkristoffers1/release/commit/cfb8f8de2d26aa5b6d35cec4a4b112bb6e996716))
+
+
+### 🔨 Refactoring
+
+* do not bump minor pre major ([2fc055c](https://github.com/simenkristoffers1/release/commit/2fc055c4df141a3c601087afe6ca1f447ba9585d))
+
+
+### 🧹 Chores
+
+* prettify changelogs ([a4dd5ba](https://github.com/simenkristoffers1/release/commit/a4dd5ba1f938d963f01acea82836feb487d03513))
+* update changelogs ([27f1aba](https://github.com/simenkristoffers1/release/commit/27f1aba85f1c0dee4eed3819f2b87e63d471273d))
+* update manifest ([709060c](https://github.com/simenkristoffers1/release/commit/709060ce7717e104dae68e68956f8f5e67a18cf7))
+* update pr title ([2b93007](https://github.com/simenkristoffers1/release/commit/2b930075fdfa3f0d64713e629936a1a5c2d0dd48))
+* update versioning ([919b099](https://github.com/simenkristoffers1/release/commit/919b099c9fe125c360ac078d09fb33deb1f06698))
+* update versioning ([45c39ae](https://github.com/simenkristoffers1/release/commit/45c39aec5c4698afbcac2d7416e3c6003d4fdda4))
+
+
+### ⏪ Reverts
+
+* changelog sections ([4659175](https://github.com/simenkristoffers1/release/commit/465917570f93ffbd629086f0e773b2853317f712))
+
 ## [1.1.9](https://github.com/simenkristoffers1/release/compare/assistant-v1.1.8...assistant-v1.1.9) (2025-07-30)
 
 
