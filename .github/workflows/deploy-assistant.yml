@@ -3,19 +3,19 @@ name: Deploy Assistant
 on:
   workflow_dispatch:
     inputs:
-      infrastructure-changed:
+      infrastructure:
         description: "Infrastructure changed"
         required: true
         type: boolean
-      migrations-changed:
+      migrations:
         description: "Migrations changed"
         required: true
         type: boolean
-      assistant-changed:
+      assistant:
         description: "Assistant changed"
         required: true
         type: boolean
-      knowledge-changed:
+      knowledge:
         description: "Knowledge changed"
         required: true
         type: boolean
@@ -30,18 +30,34 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     outputs:
-      infrastructure-changed: ${{ inputs.infrastructure-changed }}
-      migrations-changed: ${{ inputs.migrations-changed }}
-      assistant-changed: ${{ inputs.assistant-changed }}
-      knowledge-changed: ${{ inputs.knowledge-changed }}
-      any_service_changed: ${{ inputs.assistant-changed || inputs.knowledge-changed }}
+      infrastructure: ${{ inputs.infrastructure }}
+      migrations: ${{ inputs.migrations }}
+      assistant: ${{ inputs.assistant }}
+      knowledge: ${{ inputs.knowledge }}
+      docs: ${{ false}}
+      any-service: ${{ steps.filter.outputs.assistant || steps.filter.outputs.knowledge-search }}
+      # infrastructure: ${{ steps.filter.outputs.infrastructure == 'true' }}
+      # migrations: ${{ steps.filter.outputs.migrations == 'true' }}
+      # assistant: ${{ steps.filter.outputs.assistant == 'true' }}
+      # knowledge: ${{ steps.filter.outputs.knowledge == 'true' }}
+      # docs: ${{ steps.filter.outputs.docs == 'true' }}
+      # any-service: ${{ steps.filter.outputs.assistant || steps.filter.outputs.knowledge-search }}
     steps:
-      - run: |
-          echo "Detecting changes..."
-          echo "Infrastructure changed: ${{ inputs.infrastructure-changed }}"
-          echo "Migrations changed: ${{ inputs.migrations-changed }}"
-          echo "Assistant changed: ${{ inputs.assistant-changed }}"
-          echo "Knowledge changed: ${{ inputs.knowledge-changed }}"
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            infrastructure:
+              - 'infrastructure/**/*.bicep'
+            migrations:
+              - 'assistant/src/DbUpMigrator/scripts/**/*.sql'
+            assistant:
+              - 'assistant/**'
+            knowledge:
+              - 'knowledge-search/**'
+            docs:
+              - 'docs/**/*.md'
 
   provision-infrastructure-staging:
     needs: detect-changes
@@ -50,7 +66,7 @@ jobs:
       environment: staging
     secrets: inherit
     if: |
-      (always() && needs.detect-changes.outputs.infrastructure-changed == 'true')
+      (always() && needs.detect-changes.outputs.infrastructure == 'true')
 
   apply-migrations-staging:
     uses: ./.github/workflows/reusable-migrate-database.yml
@@ -59,8 +75,8 @@ jobs:
       environment: staging
     secrets: inherit
     if: |
-      (always() && needs.detect-changes.outputs.migrations-changed == 'true' &&
-      (needs.provision-infrastructure-staging.result != 'success' || needs.provision-infrastructure-staging.result == 'skipped'))
+      (always() && needs.detect-changes.outputs.migrations == 'true' &&
+      (needs.provision-infrastructure-staging.result == 'success' || needs.provision-infrastructure-staging.result == 'skipped'))
 
   prepare-build-matrix:
     runs-on: ubuntu-latest
@@ -71,7 +87,7 @@ jobs:
       - id: set-matrix
         run: |
           matrix="[]"
-          if [[ "${{ needs.detect-changes.outputs.assistant-changed }}" == "true" ]]; then
+          if [[ "${{ needs.detect-changes.outputs.assistant }}" == "true" ]]; then
             matrix=$(echo "$matrix" | jq -c '. += [{
               "component":"assistant",
               "resource-group":"aiasst-staging",
@@ -89,7 +105,7 @@ jobs:
               "file":"./assistant/Dockerfile.ConversationCleanupJob"
             }]')
           fi
-          if [[ "${{ needs.detect-changes.outputs.knowledge-changed }}" == "true" ]]; then
+          if [[ "${{ needs.detect-changes.outputs.knowledge }}" == "true" ]]; then
             matrix=$(echo "$matrix" | jq -c '. += [{
               "component":"knowledge",
               "resource-group":"aiasst-staging",
@@ -113,29 +129,35 @@ jobs:
       context: ${{ matrix.context }}
       file: ${{ matrix.file }}
       image-tag: staging
-    if: always() && ${{ needs.detect-changes.outputs.any_service_changed == 'true' }}
+    if: always() && ${{ needs.detect-changes.outputs.any-service == 'true' }}
 
   deploy-assistant-ca-staging:
     uses: ./.github/workflows/publish-container-app.yml
-    needs: [build-images]
+    needs: [build-images, apply-migrations-staging]
     with:
       environment: staging
       resource-group: aiasst-staging
       container-app-name: aiasst-api
       image-name: aiasst-knowledge:${{ github.sha }}
     secrets: inherit
-    if: always() && needs.build-images.result == 'success'
+    if: |
+      always() &&
+      (needs.build-images.result == 'success') &&
+      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped')
 
   deploy-knowledge-ca-staging:
     uses: ./.github/workflows/publish-container-app.yml
-    needs: [build-images]
+    needs: [build-images, apply-migrations-staging]
     with:
       environment: staging
       resource-group: aiasst-staging
       container-app-name: aiasst-knowledge
       image-name: aiasst-knowledge:${{ github.sha }}
     secrets: inherit
-    if: always() && needs.build-images.result == 'success'
+    if: |
+      always() &&
+      (needs.build-images.result == 'success') &&
+      (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped')
 
   wait-for-production-approval:
     runs-on: ubuntu-latest
@@ -156,7 +178,7 @@ jobs:
       environment: production
     secrets: inherit
     if: |
-      (always() && needs.detect-changes.outputs.infrastructure-changed == 'true')
+      (always() && needs.detect-changes.outputs.infrastructure == 'true')
 
   apply-migrations-production:
     needs: [detect-changes, provision-infrastructure-production]
@@ -165,7 +187,7 @@ jobs:
       environment: production
     secrets: inherit
     if: |
-      (always() && needs.detect-changes.outputs.migrations-changed == 'true' &&
+      (always() && needs.detect-changes.outputs.migrations == 'true' &&
       (needs.provision-infrastructure-production.result == 'success' || needs.provision-infrastructure-production.result == 'skipped'))
 
   promote-images:
@@ -184,22 +206,28 @@ jobs:
 
   deploy-assistant-ca-production:
     uses: ./.github/workflows/publish-container-app.yml
-    needs: [promote-images]
+    needs: [promote-images, apply-migrations-production]
     with:
-      environment: staging
-      resource-group: aiasst-staging
+      environment: production
+      resource-group: aiasst-production
       container-app-name: aiasst-api
       image-name: aiasst-knowledge:${{ github.sha }}
     secrets: inherit
-    if: always() && needs.promote-images.result == 'success'
+    if: |
+      always() &&
+      (needs.promote-images.result == 'success') &&
+      (needs.apply-migrations-production.result == 'success' || needs.apply-migrations-production.result == 'skipped')
 
   deploy-knowledge-ca-production:
     uses: ./.github/workflows/publish-container-app.yml
-    needs: [promote-images]
+    needs: [promote-images, apply-migrations-production]
     with:
-      environment: staging
-      resource-group: aiasst-staging
+      environment: production
+      resource-group: aiasst-production
       container-app-name: aiasst-knowledge
       image-name: aiasst-knowledge:${{ github.sha }}
     secrets: inherit
-    if: always() && needs.promote-images.result == 'success'
+    if: |
+      always() &&
+      (needs.promote-images.result == 'success') &&
+      (needs.apply-migrations-production.result == 'success' || needs.apply-migrations-production.result == 'skipped')
