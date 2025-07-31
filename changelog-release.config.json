@@ -22,6 +22,10 @@
             "section": "⚡ Performance Improvements"
         },
         {
+            "type": "deps",
+            "section": "⬆️ Dependencies"
+        },
+        {
             "type": "docs",
             "section": "📝 Documentation"
         },
