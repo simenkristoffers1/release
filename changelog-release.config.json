@@ -1,10 +1,12 @@
 {
     "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
-    "bootstrap-sha": "66e9087f91cd336381ab12c3c85f021bf2794e22",
+    "bootstrap-sha": "a8a7001fad22ee3f7a84d04e25f4c435c7298050",
     "include-component-in-tag": true,
     "tag-separator": "@",
     "packages": {
         ".": {
+            "component": "changelog",
+            "package-name": "changelog",
             "release-type": "simple",
             "versioning": "always-bump-major",
             "initial-version": "1"
