@@ -15,13 +15,14 @@ on:
     # Runs at 2pm UTC every Friday (change timezone if needed)
     - cron: "0 14 * * 5"
 
+permissions:
+  issues: write
+  contents: write
+  pull-requests: write
+
 jobs:
   generate-changelogs:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      contents: write
-      pull-requests: write
     steps:
       - uses: googleapis/release-please-action@v4
         id: release

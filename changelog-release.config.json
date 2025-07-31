@@ -3,7 +3,7 @@
     "bootstrap-sha": "a8a7001fad22ee3f7a84d04e25f4c435c7298050",
     "include-component-in-tag": true,
     "tag-separator": "@",
-    "pull-request-title-pattern": "chore(changelog): 📄 weekly update",
+    "pull-request-title-pattern": "chore${scope}: weekly changelogs${component} ${version}",
     "pull-request-header": "📢 Automated weekly changelog update.",
     "packages": {
         ".": {
