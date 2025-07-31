@@ -34,6 +34,7 @@ jobs:
       migrations-changed: ${{ inputs.migrations-changed }}
       assistant-changed: ${{ inputs.assistant-changed }}
       knowledge-changed: ${{ inputs.knowledge-changed }}
+      any_service_changed: ${{ inputs.assistant-changed || inputs.knowledge-changed }}
     steps:
       - run: |
           echo "Detecting changes..."
@@ -43,72 +44,99 @@ jobs:
           echo "Knowledge changed: ${{ inputs.knowledge-changed }}"
 
   provision-infrastructure-staging:
-    runs-on: ubuntu-latest
-    environment: staging
     needs: detect-changes
+    uses: ./.github/workflows/reusable-deploy-infrastructure.yml
+    with:
+      environment: staging
+    secrets: inherit
     if: |
       (always() && needs.detect-changes.outputs.infrastructure-changed == 'true')
-    steps:
-      - run: |
-          echo "Provisioning infrastructure..."
 
   apply-migrations-staging:
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/reusable-migrate-database.yml
     needs: [detect-changes, provision-infrastructure-staging]
+    with:
+      environment: staging
+    secrets: inherit
     if: |
       (always() && needs.detect-changes.outputs.migrations-changed == 'true' &&
       (needs.provision-infrastructure-staging.result != 'success' || needs.provision-infrastructure-staging.result == 'skipped'))
-    environment: staging
-    steps:
-      - run: |
-          echo "Applying migrations..."
 
-  build-images:
+  build:
+    needs: detect-changes
+    # Only run this job if either the assistant or knowledge service files have changed.
+    if: needs.detect-changes.outputs.any_service_changed == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      # Pass image names with digests to downstream jobs
+      images: ${{ steps.build-images.outputs.images }}
     strategy:
+      fail-fast: false
       matrix:
-        component: [assistant, cleanup-job, knowledge]
+        # Define services here to easily add/remove them later.
         include:
-          - component: assistant
+          - name: assistant
             image-name: aiasst-api
             context: ./assistant
             file: ./assistant/Dockerfile
-          - component: cleanup-job
+            # Run this matrix leg only if its specific path changed.
+            if_changed: needs.detect-changes.outputs.assistant == 'true'
+          - name: cleanup-job
             image-name: aiasst-cleanup-job
             context: ./assistant
             file: ./assistant/Dockerfile.ConversationCleanupJob
-          - component: knowledge
+            if_changed: needs.detect-changes.outputs.assistant == 'true'
+          - name: knowledge
             image-name: aiasst-knowledge
             context: ./knowledge-search
             file: ./knowledge-search/Dockerfile
-    uses: ./.github/workflows/reusable-build-docker.yml
-    with:
-      image-name: ${{ matrix.image-name }}
-      context: ${{ matrix.context }}
-      file: ${{ matrix.file }}
-
-  debug:
-    runs-on: ubuntu-latest
-    needs: build-images
+            if_changed: needs.detect-changes.outputs.knowledge == 'true'
     steps:
-      - run: |
-          echo "Assistant image name: aiasst-api:${{ github.sha }}"
-          echo "Cleanup job image name: aiasst-cleanup-job:${{ github.sha }}"
-          echo "Knowledge image name: aiasst-knowledge:${{ github.sha }}"
+      # This step aggregates built image names for later use.
+      - name: Build and push Docker image
+        id: build-images
+        if: ${{ matrix.if_changed }}
+        uses: ./.github/workflows/reusable-build-docker.yml
+        with:
+          image-name: ${{ matrix.image-name }}
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
 
   # build-assistant-image:
   #   uses: ./.github/workflows/reusable-build-docker.yml
   #   needs: [detect-changes, apply-migrations-staging]
-  #   if: |
-  #     (always() && needs.detect-changes.outputs.assistant-changed == 'true' &&
-  #     (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
   #   with:
   #     image-name: aiasst-api
   #     context: ./assistant
   #     file: ./assistant/Dockerfile
+  #   if: |
+  #     (always() && needs.detect-changes.outputs.assistant-changed == 'true' &&
+  #     (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
+
+  # build-cleanup-job-image:
+  #   uses: ./.github/workflows/reusable-build-docker.yml
+  #   needs: [detect-changes, apply-migrations-staging]
+  #   with:
+  #     image-name: aiasst-cleanup-job
+  #     context: ./assistant
+  #     file: ./assistant/Dockerfile.ConversationCleanupJob
+  #   if: |
+  #     (always() && needs.detect-changes.outputs.assistant-changed == 'true' &&
+  #     (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
+
+  # build-knowledge-image:
+  #   uses: ./.github/workflows/reusable-build-docker.yml
+  #   needs: [detect-changes, apply-migrations-staging]
+  #   with:
+  #     image-name: aiasst-knowledge
+  #     context: ./knowledge-search
+  #     file: ./knowledge-search/Dockerfile
+  #   if: |
+  #     (always() && needs.detect-changes.outputs.knowledge-changed == 'true' &&
+  #     (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
 
   # deploy-assistant-image-staging:
   #   uses: ./.github/workflows/publish-container-app.yml
-  #   if: always() && needs.build-assistant-image.result == 'success'
   #   needs: [build-assistant-image]
   #   with:
   #     environment: staging
@@ -116,32 +144,10 @@ jobs:
   #     container-app-name: aiasst-api
   #     image-name: ${{ needs.build-assistant-image.outputs.image-name-with-digest }}
   #   secrets: inherit
-
-  # build-cleanup-job-image:
-  #   uses: ./.github/workflows/reusable-build-docker.yml
-  #   needs: [detect-changes, apply-migrations-staging]
-  #   if: |
-  #     (always() && needs.detect-changes.outputs.assistant-changed == 'true' &&
-  #     (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
-  #   with:
-  #     image-name: aiasst-cleanup-job
-  #     context: ./assistant
-  #     file: ./assistant/Dockerfile.ConversationCleanupJob
-
-  # build-knowledge-image:
-  #   uses: ./.github/workflows/reusable-build-docker.yml
-  #   needs: [detect-changes, apply-migrations-staging]
-  #   if: |
-  #     (always() && needs.detect-changes.outputs.knowledge-changed == 'true' &&
-  #     (needs.apply-migrations-staging.result == 'success' || needs.apply-migrations-staging.result == 'skipped'))
-  #   with:
-  #     image-name: aiasst-knowledge
-  #     context: ./knowledge-search
-  #     file: ./knowledge-search/Dockerfile
+  #   if: always() && needs.build-assistant-image.result == 'success'
 
   # deploy-knowledge-image-staging:
   #   uses: ./.github/workflows/publish-container-app.yml
-  #   if: always() && needs.build-knowledge-image.result == 'success'
   #   needs: [build-knowledge-image]
   #   with:
   #     environment: staging
@@ -149,6 +155,7 @@ jobs:
   #     container-app-name: aiasst-knowledge
   #     image-name: ${{ needs.build-knowledge-image.outputs.image-name-with-digest }}
   #   secrets: inherit
+  #   if: always() && needs.build-knowledge-image.result == 'success'
 
   # wait-for-production-approval:
   #   runs-on: ubuntu-latest
@@ -159,56 +166,59 @@ jobs:
   #         echo "Waiting for production approval..."
 
   # provision-infrastructure-production:
-  #   runs-on: ubuntu-latest
-  #   environment: production
   #   needs: [detect-changes, wait-for-production-approval]
+  #   uses: ./.github/workflows/reusable-deploy-infrastructure.yml
+  #   with:
+  #     environment: production
+  #   secrets: inherit
   #   if: |
   #     (always() && needs.detect-changes.outputs.infrastructure-changed == 'true')
-  #   steps:
-  #     - run: |
-  #         echo "Provisioning infrastructure..."
 
   # apply-migrations-production:
-  #   runs-on: ubuntu-latest
   #   needs: [detect-changes, provision-infrastructure-production]
-  #   environment: production
+  #   uses: ./.github/workflows/reusable-migrate-database.yml
+  #   with:
+  #     environment: production
+  #   secrets: inherit
   #   if: |
   #     (always() && needs.detect-changes.outputs.migrations-changed == 'true' &&
   #     (needs.provision-infrastructure-production.result == 'success' || needs.provision-infrastructure-production.result == 'skipped'))
-  #   steps:
-  #     - run: |
-  #         echo "Applying migrations..."
-
-  # test-production:
-  #   runs-on: ubuntu-latest
-  #   environment: production
-  #   needs:
-  #     [
-  #       wait-for-production-approval,
-  #       provision-infrastructure-production,
-  #       apply-migrations-production,
-  #     ]
-  #   steps:
-  #     - run: |
-  #         echo "Testing assistant in production..."
 
   # promote-assistant-image-staging:
   #   uses: ./.github/workflows/reusable-promote-docker.yml
-  #   needs:
-  #     [
-  #       deploy-assistant-image-staging,
-  #       build-cleanup-job-image,
-  #       apply-migrations-production,
-  #     ]
+  #   needs: [build-assistant-image, apply-migrations-production]
   #   if: |
   #     (always() &&
-  #     needs.deploy-assistant-image-staging.result == 'success' &&
-  #     needs.build-cleanup-job-image.result == 'success' &&
+  #     needs.build-assistant-image.result == 'success' &&
   #     (needs.apply-migrations-production.result == 'success' || needs.apply-migrations-production.result == 'skipped'))
   #   with:
   #     image_name: aiasst-api
   #     image_tag: staging
   #     promote_to: production
+
+  # promote-cleanup-job-image-staging:
+  #   uses: ./.github/workflows/reusable-promote-docker.yml
+  #   needs: [build-cleanup-job-image, apply-migrations-production]
+  #   with:
+  #     image_name: aiasst-cleanup-job
+  #     image_tag: staging
+  #     promote_to: production
+  #   if: |
+  #     (always() &&
+  #     needs.build-cleanup-job-image.result == 'success' &&
+  #     (needs.apply-migrations-production.result == 'success' || needs.apply-migrations-production.result == 'skipped'))
+
+  # promote-knowledge-image:
+  #   uses: ./.github/workflows/reusable-promote-docker.yml
+  #   needs: [build-knowledge-image, apply-migrations-production]
+  #   with:
+  #     image_name: aiasst-knowledge
+  #     image_tag: staging
+  #     promote_to: production
+  #   if: |
+  #     (always() &&
+  #     needs.build-knowledge-image.result == 'success' &&
+  #     (needs.apply-migrations-production.result == 'success' || needs.apply-migrations-production.result == 'skipped'))
 
   # deploy-assistant-image-production:
   #   uses: ./.github/workflows/publish-container-app.yml
@@ -220,42 +230,6 @@ jobs:
   #     container-app-name: aiasst-api
   #     image-name: ${{ needs.promote-assistant-image-staging.outputs.promoted-image }}
   #   secrets: inherit
-
-  # promote-cleanup-job-image-staging:
-  #   uses: ./.github/workflows/reusable-promote-docker.yml
-  #   needs:
-  #     [
-  #       build-cleanup-job-image,
-  #       deploy-assistant-image-staging,
-  #       apply-migrations-production,
-  #     ]
-  #   if: |
-  #     (always() &&
-  #     needs.build-cleanup-job-image.result == 'success' &&
-  #     needs.deploy-assistant-image-staging.result == 'success' &&
-  #     (needs.apply-migrations-production.result == 'success' || needs.apply-migrations-production.result == 'skipped'))
-  #   with:
-  #     image_name: aiasst-cleanup-job
-  #     image_tag: staging
-  #     promote_to: production
-
-  # promote-knowledge-image:
-  #   uses: ./.github/workflows/reusable-promote-docker.yml
-  #   needs:
-  #     [
-  #       deploy-knowledge-image-staging,
-  #       deploy-assistant-image-staging,
-  #       apply-migrations-production,
-  #     ]
-  #   if: |
-  #     (always() &&
-  #     needs.deploy-knowledge-image-staging.result == 'success' &&
-  #     needs.deploy-assistant-image-staging.result == 'success' &&
-  #     (needs.apply-migrations-production.result == 'success' || needs.apply-migrations-production.result == 'skipped'))
-  #   with:
-  #     image_name: aiasst-knowledge
-  #     image_tag: staging
-  #     promote_to: production
 
   # deploy-knowledge-image-production:
   #   uses: ./.github/workflows/publish-container-app.yml
