@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.1.0](https://github.com/simenkristoffers1/release/compare/v1.0.3...v1.1.0) (2025-07-31)
+
+
+### 🚀 Features
+
+* **plugins:** add new search plugin and fix docs ([cdabc9a](https://github.com/simenkristoffers1/release/commit/cdabc9a4d3fe32a474869ef8fa27e52e606b8045))
+* **search:** implement initial version of the search plugin ([92dc1ef](https://github.com/simenkristoffers1/release/commit/92dc1ef73981844e10eb9c170c202662f937fe00))
+
+
+### 🐞 Bug Fixes
+
+* **docs:** correct typo in the RAG system documentation ([92dc1ef](https://github.com/simenkristoffers1/release/commit/92dc1ef73981844e10eb9c170c202662f937fe00))
+* fix 1 ([#80](https://github.com/simenkristoffers1/release/issues/80)) ([495da4a](https://github.com/simenkristoffers1/release/commit/495da4a1f96ec6178fa8473b82dfed8b07776584))
+* fix 11 ([#82](https://github.com/simenkristoffers1/release/issues/82)) ([cdabc9a](https://github.com/simenkristoffers1/release/commit/cdabc9a4d3fe32a474869ef8fa27e52e606b8045))
+* fix 2 ([495da4a](https://github.com/simenkristoffers1/release/commit/495da4a1f96ec6178fa8473b82dfed8b07776584))
+* fix 21 ([92dc1ef](https://github.com/simenkristoffers1/release/commit/92dc1ef73981844e10eb9c170c202662f937fe00))
+* fix 21 ([#83](https://github.com/simenkristoffers1/release/issues/83)) ([92dc1ef](https://github.com/simenkristoffers1/release/commit/92dc1ef73981844e10eb9c170c202662f937fe00))
+* fix 3 ([495da4a](https://github.com/simenkristoffers1/release/commit/495da4a1f96ec6178fa8473b82dfed8b07776584))
+
+
+### 🧹 Chores
+
+* **changelog:** 📄 update for v1.0.2 ([#78](https://github.com/simenkristoffers1/release/issues/78)) ([2682da3](https://github.com/simenkristoffers1/release/commit/2682da3437004db68b84867dd81029202c65849a))
+* **changelog:** 📄 weekly update ([#79](https://github.com/simenkristoffers1/release/issues/79)) ([956d3e2](https://github.com/simenkristoffers1/release/commit/956d3e2dc86742da99cdb94ff3c2a566df38da50))
+* some chore ([495da4a](https://github.com/simenkristoffers1/release/commit/495da4a1f96ec6178fa8473b82dfed8b07776584))
+* update dependencies for the new plugin ([92dc1ef](https://github.com/simenkristoffers1/release/commit/92dc1ef73981844e10eb9c170c202662f937fe00))
+* Update PR titlte ([b00ae62](https://github.com/simenkristoffers1/release/commit/b00ae62d8c52caf9576a1521e49d58240ed2fe7b))
+
 ## [1.0.3](https://github.com/simenkristoffers1/release/compare/v1.0.2...v1.0.3) (2025-07-31)
 
 
