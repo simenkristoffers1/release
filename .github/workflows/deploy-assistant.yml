@@ -62,8 +62,26 @@ jobs:
       (always() && needs.detect-changes.outputs.migrations-changed == 'true' &&
       (needs.provision-infrastructure-staging.result != 'success' || needs.provision-infrastructure-staging.result == 'skipped'))
 
-  build:
+  prepare-build-matrix:
+    runs-on: ubuntu-latest
     needs: detect-changes
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        name: Prepare Build Matrix
+        run: |
+          matrix=()
+          if [[ "${{ needs.detect-changes.outputs.assistant-changed }}" == "true" ]]; then
+            matrix+=("assistant")
+          fi
+          if [[ "${{ needs.detect-changes.outputs.knowledge-changed }}" == "true" ]]; then
+            matrix+=("knowledge")
+          fi
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+  build:
+    needs: [detect-changes, prepare-build-matrix]
     # Only run this job if either the assistant or knowledge service files have changed.
     if: needs.detect-changes.outputs.any_service_changed == 'true'
     runs-on: ubuntu-latest
@@ -74,19 +92,20 @@ jobs:
       fail-fast: false
       matrix:
         # Define services here to easily add/remove them later.
+        component: ${{ needs.prepare-build-matrix.outputs.matrix }}
         include:
-          - name: assistant
+          - component: assistant
             image-name: aiasst-api
             context: ./assistant
             file: ./assistant/Dockerfile
             # Run this matrix leg only if its specific path changed.
             if_changed: needs.detect-changes.outputs.assistant == 'true'
-          - name: cleanup-job
+          - component: cleanup-job
             image-name: aiasst-cleanup-job
             context: ./assistant
             file: ./assistant/Dockerfile.ConversationCleanupJob
             if_changed: needs.detect-changes.outputs.assistant == 'true'
-          - name: knowledge
+          - component: knowledge
             image-name: aiasst-knowledge
             context: ./knowledge-search
             file: ./knowledge-search/Dockerfile
