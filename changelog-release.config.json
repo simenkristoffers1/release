@@ -5,9 +5,7 @@
     "tag-separator": "@",
     "packages": {
         ".": {
-            "release-type": "simple",
-            "versioning": "always-bump-major",
-            "initial-version": "1"
+            "release-type": "simple"
         }
     }
 }
