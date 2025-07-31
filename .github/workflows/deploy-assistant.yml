@@ -74,6 +74,7 @@ jobs:
           matrix="[]"
           if [[ "true" == "true" ]]; then
             matrix=$(echo "$matrix" | jq -c '. += ["assistant"]')
+            matrix=$(echo "$matrix" | jq -c '. += ["cleanup-job"]')
           fi
           if [[ "true" == "true" ]]; then
             matrix=$(echo "$matrix" | jq -c '. += ["knowledge"]')
@@ -82,17 +83,13 @@ jobs:
 
   build:
     needs: [detect-changes, prepare-build-matrix]
-    # Only run this job if either the assistant or knowledge service files have changed.
     if: needs.detect-changes.outputs.any_service_changed == 'true'
     runs-on: ubuntu-latest
-    outputs:
-      # Pass image names with digests to downstream jobs
-      images: ${{ steps.build-images.outputs.images }}
     strategy:
       fail-fast: false
       matrix:
         # Define services here to easily add/remove them later.
-        component: ${{ needs.prepare-build-matrix.outputs.matrix }}
+        component: ${{ fromJson(needs.prepare-build-matrix.outputs.matrix) }}
         include:
           - component: assistant
             image-name: aiasst-api
