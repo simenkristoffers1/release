@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.2](https://github.com/simenkristoffers1/release/compare/v1.0.1...v1.0.2) (2025-07-31)
+
+
+### 🐞 Bug Fixes
+
+* update token ([adaa272](https://github.com/simenkristoffers1/release/commit/adaa272c0d7030509fa28d4ef9e92a812115e701))
+
+
+### ⏪ Reverts
+
+* revert personal access token ([d59042c](https://github.com/simenkristoffers1/release/commit/d59042cc21eac59bce630e5581e31d5e2174b179))
+
 ## [1.0.1](https://github.com/simenkristoffers1/release/compare/v1.0.0...v1.0.1) (2025-07-31)
 
 
