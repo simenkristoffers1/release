@@ -19,11 +19,7 @@
         },
         {
             "type": "perf",
-            "section": "⚡ Performance"
-        },
-        {
-            "type": "refactor",
-            "section": "🔨 Refactoring"
+            "section": "⚡ Performance Improvements"
         },
         {
             "type": "docs",
@@ -31,11 +27,31 @@
         },
         {
             "type": "style",
-            "section": "🎨 Style"
+            "section": "🎨 Code Style"
+        },
+        {
+            "type": "refactor",
+            "section": "🔨 Refactoring"
+        },
+        {
+            "type": "test",
+            "section": "🧪 Tests"
+        },
+        {
+            "type": "build",
+            "section": "🏗 Build System"
+        },
+        {
+            "type": "ci",
+            "section": "🤖 Continuous Integration"
         },
         {
             "type": "chore",
-            "section": "Other"
+            "section": "🧹 Chores"
+        },
+        {
+            "type": "revert",
+            "section": "⏪ Reverts"
         }
     ]
 }
