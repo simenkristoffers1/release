@@ -93,6 +93,7 @@ jobs:
             if_changed: needs.detect-changes.outputs.knowledge == 'true'
     steps:
       # This step aggregates built image names for later use.
+      - uses: actions/checkout@v4
       - name: Build and push Docker image
         id: build-images
         if: ${{ matrix.if_changed }}
