@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/simenkristoffers1/release/compare/v1.0.2...v1.0.3) (2025-07-31)
+
+
+### 🧹 Chores
+
+* Update PR titlte ([b00ae62](https://github.com/simenkristoffers1/release/commit/b00ae62d8c52caf9576a1521e49d58240ed2fe7b))
+
 ## [1.0.2](https://github.com/simenkristoffers1/release/compare/v1.0.1...v1.0.2) (2025-07-31)
 
 
