@@ -12,11 +12,6 @@ Closes #
 - [ ] 🧪 Tests (adding missing tests or correcting existing tests)
 - [ ] 💅 Refactor (a code change that neither fixes a bug nor adds a feature)
 
-**How Has This Been Tested?**
-Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce.
-- [ ] Test A
-- [ ] Test B
-
 **Checklist:**
 - [ ] My code follows the style guidelines of this project.
 - [ ] I have performed a self-review of my own code.
